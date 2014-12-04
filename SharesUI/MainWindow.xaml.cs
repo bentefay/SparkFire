@@ -14,7 +14,7 @@ namespace SharesUI
             InitializeComponent();
 
             var prototypeParser = new PrototypeEodParser();
-            Content.Text = prototypeParser.ParseFile();
+            Data.Text = prototypeParser.ParseFile();
 
             var eod = new EodParser();
             var csv = new CsvParser();

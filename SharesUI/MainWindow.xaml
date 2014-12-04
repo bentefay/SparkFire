@@ -10,7 +10,7 @@
                 <ColumnDefinition Width="*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
         
-            <TextBox Grid.Column="0" x:Name="Content" AcceptsReturn="True" TextWrapping="Wrap" FontFamily="Courier New"
+            <TextBox Grid.Column="0" x:Name="Data" AcceptsReturn="True" TextWrapping="Wrap" FontFamily="Courier New"
                 IsReadOnly="True" />
         </Grid>
     </ScrollViewer>

@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("SharesWebUI")]
+[assembly: AssemblyTitle("SharesWebUI.Tests")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("SharesWebUI")]
+[assembly: AssemblyProduct("SharesWebUI.Tests")]
 [assembly: AssemblyCopyright("Copyright ©  2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("66450c67-dbec-425c-82b2-d91e78dc32d2")]
+[assembly: Guid("bc1ba112-95f5-4977-812b-5fd6b0efc3fd")]
 
 // Version information for an assembly consists of the following four values:
 //
