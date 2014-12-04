@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Linq;
 using System.Windows;
+using Shares.Model.Parsers;
 
 namespace SharesUI
 {
