@@ -1,0 +1,18 @@
+﻿<Window x:Class="SharesUI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" Height="350" Width="525">
+    
+    <ScrollViewer>
+        <Grid>
+        
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+        
+            <TextBox Grid.Column="0" x:Name="Content" AcceptsReturn="True" TextWrapping="Wrap" FontFamily="Courier New"
+                IsReadOnly="True" />
+        </Grid>
+    </ScrollViewer>
+
+</Window>
