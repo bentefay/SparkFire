@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharesUI", "SharesUI\SharesUI.csproj", "{94DC60B4-D189-4515-927B-E3D9512338FF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{665C9492-F7A3-4102-8303-9D12E7A051AA}"
@@ -10,11 +12,22 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{665C94
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharesWebUI", "SharesWebUI\SharesWebUI.csproj", "{7A34685F-C259-4D63-B4AE-084AA41F9F2B}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharesWebUI.Tests", "SharesWebUI.Tests\SharesWebUI.Tests.csproj", "{009A0A5B-7D63-4222-B7B3-03280C120E25}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shares.Model", "Shares.Model\Shares.Model.csproj", "{E74354F9-16ED-4283-8CB3-FE065A191D2A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shares.Web", "Shares.Web\Shares.Web.csproj", "{40129524-7BF1-45BE-8A5A-C498486505DD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shares.Web.Tests", "Shares.Web.Tests\Shares.Web.Tests.csproj", "{7ED89063-82F5-41FC-AE40-F03ED9A430FD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PublishScripts", "PublishScripts", "{41D6B95D-3FE8-4DA4-8472-063A6950588F}"
+	ProjectSection(SolutionItems) = preProject
+		PublishScripts\AzureWebsitePublishModule.psm1 = PublishScripts\AzureWebsitePublishModule.psm1
+		PublishScripts\Publish-WebApplicationWebsite.ps1 = PublishScripts\Publish-WebApplicationWebsite.ps1
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Configurations", "Configurations", "{F0A81C1C-D580-4198-8675-3EF5F3DAC8BA}"
+	ProjectSection(SolutionItems) = preProject
+		PublishScripts\Configurations\SharesWeb-WAWS-dev.json = PublishScripts\Configurations\SharesWeb-WAWS-dev.json
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -26,20 +39,23 @@ Global
 		{94DC60B4-D189-4515-927B-E3D9512338FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{94DC60B4-D189-4515-927B-E3D9512338FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{94DC60B4-D189-4515-927B-E3D9512338FF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7A34685F-C259-4D63-B4AE-084AA41F9F2B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7A34685F-C259-4D63-B4AE-084AA41F9F2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7A34685F-C259-4D63-B4AE-084AA41F9F2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7A34685F-C259-4D63-B4AE-084AA41F9F2B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{009A0A5B-7D63-4222-B7B3-03280C120E25}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{009A0A5B-7D63-4222-B7B3-03280C120E25}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{009A0A5B-7D63-4222-B7B3-03280C120E25}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{009A0A5B-7D63-4222-B7B3-03280C120E25}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E74354F9-16ED-4283-8CB3-FE065A191D2A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E74354F9-16ED-4283-8CB3-FE065A191D2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E74354F9-16ED-4283-8CB3-FE065A191D2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E74354F9-16ED-4283-8CB3-FE065A191D2A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{40129524-7BF1-45BE-8A5A-C498486505DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{40129524-7BF1-45BE-8A5A-C498486505DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{40129524-7BF1-45BE-8A5A-C498486505DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{40129524-7BF1-45BE-8A5A-C498486505DD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7ED89063-82F5-41FC-AE40-F03ED9A430FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7ED89063-82F5-41FC-AE40-F03ED9A430FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7ED89063-82F5-41FC-AE40-F03ED9A430FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7ED89063-82F5-41FC-AE40-F03ED9A430FD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{F0A81C1C-D580-4198-8675-3EF5F3DAC8BA} = {41D6B95D-3FE8-4DA4-8472-063A6950588F}
 	EndGlobalSection
 EndGlobal
