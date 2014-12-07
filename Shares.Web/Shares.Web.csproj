@@ -276,6 +276,7 @@
     <Content Include="Content\shares\devextreme\js\jquery-2.1.1.min.js" />
     <Content Include="Content\shares\devextreme\js\knockout-3.1.0.debug.js" />
     <Content Include="Content\shares\devextreme\js\knockout-3.1.0.js" />
+    <Content Include="Content\shares\devextreme\js\knockout-min.js" />
     <Content Include="Content\shares\devextreme\js\localization\dx.all.de.js" />
     <Content Include="Content\shares\devextreme\js\localization\dx.all.fr.js" />
     <Content Include="Content\shares\devextreme\js\localization\dx.all.ja.js" />
