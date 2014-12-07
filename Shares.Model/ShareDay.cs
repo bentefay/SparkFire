@@ -4,7 +4,8 @@ namespace Shares.Model
 {
     public class ShareDay
     {
-        public Byte Flag { get; set; }
+        public byte[] Bytes { get; set; }
+        public Tf Tf { get; set; }
         public Byte Unknown1 { get; set; }
         public DateTime Date { get; set; }
         public Single Open { get; set; }
@@ -14,12 +15,13 @@ namespace Shares.Model
         public Int32 Volume { get; set; }
         public UInt16 OpenInt { get; set; }
         public Byte[] Unknown2 { get; set; }
+        public int Row { get; set; }
 
         public override string ToString()
         {
             var fields = new[]
             {
-                Flag.ToString("X"),
+                Tf.ToString("X"),
                 Date.ToString("yyyyMMdd"),
                 Open.ToString("00.000"),
                 High.ToString("00.000"),

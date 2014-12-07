@@ -85,7 +85,7 @@ namespace Shares.Model.Parsers
                         {
                             character.ToString("000000"),
                             row.ToString("00000") + "|",
-                            Hex(bytes.Skip(6).ToArray()) + "|",
+                            Hex(bytes.ToArray()) + "|",
                             csvDate.ToString("yyyyMMdd"),
                             csvOpen.ToString("00.000"),
                             csvHigh.ToString("00.000"),

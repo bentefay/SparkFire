@@ -12,8 +12,6 @@ namespace Shares.Model.Parsers
         {
             using (var csv = new StreamReader(filePath))
             {
-                csv.ReadLine();
-
                 var share = new Share();
                 var row = 0;
 
@@ -22,7 +20,7 @@ namespace Shares.Model.Parsers
                 while (!csv.EndOfStream)
                 {
                     var cells = csv.ReadLine().Split(',');
-                    Debug.Assert(cells.Length == 10);
+                    Debug.Assert(cells.Length == 9);
 
                     var day = new ShareDay();
 
