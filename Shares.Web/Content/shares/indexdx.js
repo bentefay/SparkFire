@@ -2,6 +2,13 @@
 $(document).ready(populateScreen);
 
 function populateScreen() {
+
+    var viewModel = function () {
+        var that = this;
+    };
+
+    ko.applyBindings(new viewModel(), document.getElementById('box'));
+
     $.ajax({
         dataType: "json",
         url: "../../api/shares/allinstrumentcodes",
