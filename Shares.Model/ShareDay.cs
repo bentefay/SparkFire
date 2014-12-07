@@ -21,7 +21,7 @@ namespace Shares.Model
         {
             var fields = new[]
             {
-                Tf.ToString("X"),
+                ((byte)Tf).ToString("X"),
                 Date.ToString("yyyyMMdd"),
                 Open.ToString("00.000"),
                 High.ToString("00.000"),

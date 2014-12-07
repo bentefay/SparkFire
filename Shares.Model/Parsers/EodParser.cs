@@ -34,6 +34,8 @@ namespace Shares.Model.Parsers
                 row++;
             }
 
+            Assert(days.Count == share.RowCount);
+
             share.Days = days.ToArray();
 
             return share;
@@ -45,6 +47,7 @@ namespace Shares.Model.Parsers
             using (var r = GetReader(new MemoryStream(headerBytes)))
             {
                 share.HeaderBytes = headerBytes;
+
                 share.Preamble = r.ReadBytes(2);
                 share.MarketCode = ReadString(r, 10).TrimEnd();
                 share.InstrumentCode = ReadString(r, 20).TrimEnd();
@@ -54,11 +57,13 @@ namespace Shares.Model.Parsers
                 share.Unknown1 = r.ReadInt32();
                 share.StartDate = ReadDate(r);
                 share.EndDate = ReadDate(r);
-                share.Info = r.ReadBytes(40);
+                share.RowCount = r.ReadUInt32();
+                share.Info1 = r.ReadInt32();
+                share.StrikePrice = r.ReadSingle();
+                share.InfoRemaining = r.ReadBytes(28);
 
                 // All = 0x20
-                share.Empty = r.ReadBytes(1152);
-                Assert(share.Empty.All(b => b == 32));
+                share.Details = ReadString(r, 1152).Trim();
             }
         }
 

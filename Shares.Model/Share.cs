@@ -12,8 +12,11 @@ namespace Shares.Model
         public Int32 Unknown1 { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
-        public Byte[] Info { get; set; }
-        public Byte[] Empty { get; set; }
+        public UInt32 RowCount { get; set; }
+        public int Info1 { get; set; }
+        public float StrikePrice { get; set; }
+        public Byte[] InfoRemaining { get; set; }
+        public string Details { get; set; }
         public ShareDay[] Days { get; set; }
     }
 }
