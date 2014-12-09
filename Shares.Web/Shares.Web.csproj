@@ -249,6 +249,7 @@
     <Content Include="Content\bootstrap.min.css" />
     <Content Include="Content\shares\devextreme\css\dx.android.holo-dark.css" />
     <Content Include="Content\shares\devextreme\css\dx.android.holo-light.css" />
+    <Content Include="Content\shares\devextreme\css\dx.android5.light.css" />
     <Content Include="Content\shares\devextreme\css\dx.common.css" />
     <Content Include="Content\shares\devextreme\css\dx.dark.css" />
     <Content Include="Content\shares\devextreme\css\dx.ios.default.css" />
