@@ -214,7 +214,7 @@ function getChartOptions(dataType) {
                 visible: true
             },
             label: {
-                visible: true
+                visible: dataType === "volume"
             },
             argumentType: 'datetime'
         },
@@ -255,31 +255,53 @@ function getChartOptions(dataType) {
     };
 }
 
-var priceBounds = {};
-var volumeBounds = {};
-var rangeBounds = {};
+var leader = null;
+var timerId = null;
 
 function updateZoom(e, controlType) {
 
     var bounds;
 
-    var price = $("#price").dxChart("instance");
-    bounds = price.businessRanges[0].arg;
+    if (leader === null) {
+        leader = controlType;
+    } else if (controlType !== leader) {
+        return;
+    }
+
+    if (timerId !== null)
+        clearTimeout(timerId);
+
+    timerId = setTimeout(function () {
+        leader = null;
+        timerId = null;
+    }, 500);
+
     if (controlType !== "price") {
-        if (bounds.minVisible !== e.startValue || bounds.maxVisible !== e.endValue)
+        var price = $("#price").dxChart("instance");
+        bounds = price.businessRanges[0].arg;
+        if (!boundsEqual(e, bounds.minVisible, bounds.maxVisible))
             price.zoomArgument(new Date(e.startValue), new Date(e.endValue));
-    } else {
-        priceBounds = e;
     }
 
     if (controlType !== "volume") {
         var volume = $("#volume").dxChart("instance");
         bounds = volume.businessRanges[0].arg;
-        if (bounds.minVisible !== e.startValue || bounds.maxVisible !== e.endValue)
+        if (!boundsEqual(e, bounds.minVisible, bounds.maxVisible))
             volume.zoomArgument(new Date(e.startValue), new Date(e.endValue));
     }
+
     if (controlType !== "range") {
         var range = $("#range").dxRangeSelector("instance");
-        range.setSelectedRange(e);
+        bounds = range.getSelectedRange();
+        if (!boundsEqual(e, bounds.startValue, bounds.endValue))
+            range.setSelectedRange(e);
     }
+}
+
+function boundsEqual(e, startValue, endValue) {
+
+    if (!startValue || !endValue || !e.startValue || !e.endValue)
+        return false;
+
+    return startValue.getTime() === e.startValue.getTime() && endValue.getTime() === e.endValue.getTime();
 }
