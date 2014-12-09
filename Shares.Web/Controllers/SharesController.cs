@@ -10,11 +10,13 @@ namespace Shares.Web.Controllers
 {
     public class SharesController : ApiController
     {
-        private const string EodFilePath = @"C:\Data\Dropbox\Git\ASX";
+        private static readonly string[] _eodFilePaths = { @"C:\Data\Dropbox\Git\ASX", @"D:\Mesh\Dropbox\Git\ASX" };
 
         public ShareDto Get(string instrumentCode)
         {
-            var fullPath = Path.Combine(EodFilePath, Path.ChangeExtension(instrumentCode, "eod"));
+            var eodFilePath = GetEodFilePath();
+
+            var fullPath = Path.Combine(eodFilePath, Path.ChangeExtension(instrumentCode, "eod"));
 
             var parser = new EodParser();
             var share = parser.ParseFile(fullPath);
@@ -24,8 +26,20 @@ namespace Shares.Web.Controllers
 
         public List<string> GetAllInstrumentCodes()
         {
-            var instrumentCodes = Directory.GetFiles(EodFilePath, "*.eod").Select(Path.GetFileNameWithoutExtension).ToList();
+            var eodFilePath = GetEodFilePath();
+
+            var instrumentCodes = Directory.GetFiles(eodFilePath, "*.eod").Select(Path.GetFileNameWithoutExtension).ToList();
+
             return instrumentCodes;
+        }
+
+        private string GetEodFilePath()
+        {
+            foreach (var filePath in _eodFilePaths)
+                if (Directory.Exists(filePath))
+                    return filePath;
+
+            throw new Exception("None of the specified paths exist.");
         }
 
         public class ShareDto

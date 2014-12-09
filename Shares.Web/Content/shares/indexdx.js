@@ -1,65 +1,47 @@
 ﻿
-$(document).ready(populateScreen);
+$(document).ready(initialisePage);
 
-function populateScreen() {
+function initialisePage() {
 
-    var viewModel = function () {
-        var that = this;
-    };
-
-    ko.applyBindings(new viewModel(), document.getElementById('box'));
+    initialiseView();
 
     $.ajax({
         dataType: "json",
         url: "../../api/shares/allinstrumentcodes",
-        success: onGetAllInstrumentCodes
+        success: onGetInstrumentCodes
     });
 }
 
-function onGetAllInstrumentCodes(data) {
+function onGetInstrumentCodes(data) {
 
     for (var i = 0; i < data.length; i++) {
         data[i] = { instrumentCode: data[i] };
     }
 
-    $("#instrumentCodeLookup").dxDataGrid({
-        dataSource: data,
-        loadPanel: false,
-        scrolling: {
-            mode: 'virtual'
-        },
-        selection: {
-            mode: 'single'
-        },
-        sorting: {
-            mode: "none"
-        },
-        filterRow: {
-            visible: true,
-            applyFilter: "auto"
-        },
-        showColumnHeaders: false,
-        hoverStateEnabled: true,
-        onSelectionChanged: function (selecteditems) {
-            var data = selecteditems.selectedRowsData[0];
-            showInstrumentCode(data.instrumentCode);
-        }
-    });
+    instrumentCodes(data);
 
-    showInstrumentCode('nab');
+    var grid = $("#instrumentCodes").dxDataGrid("instance");
+
+    var onContentReader = function() {
+        grid.selectRowsByIndexes([0]);
+        grid.off('contentReady', onContentReader);
+    };
+
+    grid.on('contentReady', onContentReader);
 }
 
-function showInstrumentCode(instrumentCode) {
+function showInstrument(instrumentCode) {
+
     $.ajax({
         dataType: "json",
         url: "../../api/shares?instrumentCode=" + instrumentCode,
-        success: onGetInstrumentCodeData,
+        success: onGetInstrumentData,
         error: (function (jqXhr, textStatus, errorThrown) {
         })
     });
 }
 
-function onGetInstrumentCodeData(data) {
+function onGetInstrumentData(data) {
 
     var days = [];
 
@@ -74,37 +56,106 @@ function onGetInstrumentCodeData(data) {
         };
     }
 
-    renderCharts({
+    updateView({
         raw: data,
         days: days
     });
 }
 
+var model;
 var days;
-var title;
-var chartsInitialised = false;
+var instrumentCodes;
 
-function renderCharts(data) {
-
-    if (!chartsInitialised) {
-        days = ko.observableArray();
-        title = ko.observable();
-    }
-
+function updateView(data) {
+    model.instrumentCode(data.raw.marketCode + " - " + data.raw.instrumentCode + " - " + data.raw.companyName);
     days(data.days);
-    title(data.raw.marketCode + " - " + data.raw.instrumentCode + " - " + data.raw.companyName);
+}
 
-    if (!chartsInitialised) {
-        chartsInitialised = true;
-        initialiseCharts();
+function initialiseView() {
+
+    model = {};
+
+    days = ko.observableArray();
+    instrumentCodes = ko.observableArray();
+
+    model.chartOptions = getChartOptions();
+    model.rangeOptions = getRangeOptions();
+    model.instrumentCodeOptions = getInstrumentCodeOptions();
+    model.instrumentCode = ko.observable();
+
+    ko.applyBindings(model);
+}
+
+function getInstrumentCodeOptions() {
+
+    return {
+        dataSource: instrumentCodes,
+        loadPanel: false,
+        scrolling: {
+            mode: 'virtual'
+        },
+        selection: {
+                mode: 'single'
+        },
+        sorting: {
+                mode: "none"
+        },
+        filterRow: {
+                visible: true,
+                applyFilter: "auto"
+        },
+        showColumnHeaders: false,
+        hoverStateEnabled: true,
+        onSelectionChanged: function(selecteditems) {
+            var data = selecteditems.selectedRowsData[0];
+            showInstrument(data.instrumentCode);
+        }
     }
 }
 
-function initialiseCharts() {
-    var model = {};
+function getRangeOptions() {
+    return {
+        dataSource: days,
+        chart: {
+            useAggregation: true,
+            valueAxis: { valueType: 'numeric' },
+            series: {
+                    type: 'line',
+                    valueField: 'open',
+                    argumentField: 'date'
+            },
+        },
+        scale: {
+                //minorTickInterval: 'month',
+                //majorTickInterval: 'year',
+                valueType: 'datetime',
+                placeholderHeight: 20,
+                minRange: {
+                    days: 20
+                }
+        },
+        behavior: {
+                callSelectedRangeChanged: "onMovingComplete",
+                snapToTicks: true,
+                allowSlidersSwap: false,
+                animation: false
+        },
+        selectedRangeChanged: function (e) {
+            var price = $("#candles").dxChart("instance");
+            price.zoomArgument(new Date(e.startValue), new Date(e.endValue));
+        },
+        sliderMarker: { visible: false },
+        margin: {
+                right: 0,
+                left: 0,
+                top: 0,
+                bottom: 0
+        }
+    }
+}
 
-    model.chartOptions = {
-        title: title,
+function getChartOptions() {
+    return {
         dataSource: days,
         panes: [
             { name: 'price' },
@@ -115,37 +166,37 @@ function initialiseCharts() {
             valueType: 'numeric'
         },
         argumentAxis: {
-            valueMarginsEnabled: false,
-            grid: {
+                valueMarginsEnabled: false,
+                grid: {
                 visible: true
-            },
+                },
             label: {
-                visible: true
+                    visible: true
             },
             argumentType: 'datetime'
         },
         crosshair: {
-            enabled: true,
-            label: {
+                enabled: true,
+                label: {
                 visible: true
-            }
+                }
         },
         tooltip: {
-            enabled: true,
-            location: "edge",
-            customizeText: function () {
-                if (!this.openValue) {
-                    return this.value;
-                } else {
-                    return "Open: $" + this.openValue + "<br/>" +
-                        "Close: $" + this.closeValue + "<br/>" +
-                        "High: $" + this.highValue + "<br/>" +
-                        "Low: $" + this.lowValue + "<br/>";
+                enabled: true,
+                location: "edge",
+                customizeText: function () {
+                    if (!this.openValue) {
+                        return this.value;
+                    } else {
+                        return "Open: $" + this.openValue + "<br/>" +
+                            "Close: $" + this.closeValue + "<br/>" +
+                            "High: $" + this.highValue + "<br/>" +
+                            "Low: $" + this.lowValue + "<br/>";
+                    }
                 }
-            }
         },
         legend: {
-            visible: false
+                visible: false
         },
         useAggregation: false,
         commonSeriesSettings: {
@@ -172,54 +223,4 @@ function initialiseCharts() {
         }],
         animation: { enabled: false }
     };
-
-    model.rangeOptions = {
-        size: {
-            height: 80
-        },
-        dataSource: days,
-        chart: {
-            useAggregation: true,
-            valueAxis: { valueType: 'numeric' },
-            series: {
-                type: 'line',
-                valueField: 'open',
-                argumentField: 'date'
-            },
-        },
-        scale: {
-            minorTickInterval: 'month',
-            majorTickInterval: 'year',
-            valueType: 'datetime',
-            placeholderHeight: 20,
-            minRange: {
-                days: 20
-            }
-        },
-        behavior: {
-            callSelectedRangeChanged: "onMovingComplete",
-            snapToTicks: true,
-            allowSlidersSwap: false,
-            animation: false
-        },
-        selectedRangeChanged: function (e) {
-            var price = $("#container #chart").dxChart("instance");
-            price.zoomArgument(new Date(e.startValue), new Date(e.endValue));
-        },
-        sliderMarker: { visible: false },
-        margin: {
-            right: 0,
-            left: 0,
-            top: 0,
-            bottom: 0
-        }
-    };
-
-    var html = [
-        '<div id="chart" data-bind="dxChart: chartOptions" style="margin: 10px"></div>',
-        '<div data-bind="dxRangeSelector: rangeOptions" style="margin: 10px"></div>'
-    ].join('');
-
-    $("#container").append(html);
-    ko.applyBindings(model, $("#container")[0]);
 }
