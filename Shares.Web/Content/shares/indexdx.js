@@ -22,7 +22,7 @@ function onGetInstrumentCodes(data) {
 
     var grid = $("#instrumentCodes").dxDataGrid("instance");
 
-    var onContentReader = function() {
+    var onContentReader = function () {
         grid.selectRowsByIndexes([0]);
         grid.off('contentReady', onContentReader);
     };
@@ -78,7 +78,8 @@ function initialiseView() {
     days = ko.observableArray();
     instrumentCodes = ko.observableArray();
 
-    model.chartOptions = getChartOptions();
+    model.priceOptions = getChartOptions('price');
+    model.volumeOptions = getChartOptions('volume');
     model.rangeOptions = getRangeOptions();
     model.instrumentCodeOptions = getInstrumentCodeOptions();
     model.instrumentCode = ko.observable();
@@ -95,18 +96,18 @@ function getInstrumentCodeOptions() {
             mode: 'virtual'
         },
         selection: {
-                mode: 'single'
+            mode: 'single'
         },
         sorting: {
-                mode: "none"
+            mode: "none"
         },
         filterRow: {
-                visible: true,
-                applyFilter: "auto"
+            visible: true,
+            applyFilter: "auto"
         },
         showColumnHeaders: false,
         hoverStateEnabled: true,
-        onSelectionChanged: function(selecteditems) {
+        onSelectionChanged: function (selecteditems) {
             var data = selecteditems.selectedRowsData[0];
             showInstrument(data.instrumentCode);
         }
@@ -120,90 +121,48 @@ function getRangeOptions() {
             useAggregation: true,
             valueAxis: { valueType: 'numeric' },
             series: {
-                    type: 'line',
-                    valueField: 'open',
-                    argumentField: 'date'
+                type: 'line',
+                valueField: 'open',
+                argumentField: 'date'
             },
         },
         scale: {
-                //minorTickInterval: 'month',
-                //majorTickInterval: 'year',
-                valueType: 'datetime',
-                placeholderHeight: 20,
-                minRange: {
-                    days: 20
-                }
+            //minorTickInterval: 'month',
+            //majorTickInterval: 'year',
+            valueType: 'datetime',
+            placeholderHeight: 20,
+            minRange: {
+                days: 20
+            }
         },
         behavior: {
-                callSelectedRangeChanged: "onMovingComplete",
-                snapToTicks: true,
-                allowSlidersSwap: false,
-                animation: false
+            callSelectedRangeChanged: "onMovingComplete",
+            snapToTicks: true,
+            allowSlidersSwap: false,
+            animation: false
         },
-        selectedRangeChanged: function (e) {
-            var price = $("#candles").dxChart("instance");
-            price.zoomArgument(new Date(e.startValue), new Date(e.endValue));
-        },
+        selectedRangeChanged: function(e) { updateZoom(e, 'range'); },
         sliderMarker: { visible: false },
         margin: {
-                right: 0,
-                left: 0,
-                top: 0,
-                bottom: 0
+            right: 0,
+            left: 0,
+            top: 0,
+            bottom: 0
         }
     }
 }
 
-function getChartOptions() {
-    return {
-        dataSource: days,
-        panes: [
-            { name: 'price' },
-            { name: 'volume' }
-        ],
-        defaultPane: 'price',
-        valueAxis: {
-            valueType: 'numeric'
-        },
-        argumentAxis: {
-                valueMarginsEnabled: false,
-                grid: {
-                visible: true
-                },
-            label: {
-                    visible: true
-            },
-            argumentType: 'datetime'
-        },
-        crosshair: {
-                enabled: true,
-                label: {
-                visible: true
-                }
-        },
-        tooltip: {
-                enabled: true,
-                location: "edge",
-                customizeText: function () {
-                    if (!this.openValue) {
-                        return this.value;
-                    } else {
-                        return "Open: $" + this.openValue + "<br/>" +
-                            "Close: $" + this.closeValue + "<br/>" +
-                            "High: $" + this.highValue + "<br/>" +
-                            "Low: $" + this.lowValue + "<br/>";
-                    }
-                }
-        },
-        legend: {
-                visible: false
-        },
-        useAggregation: false,
-        commonSeriesSettings: {
-            ignoreEmptyPoints: true
-        },
-        series: [{
-            pane: 'price',
+function getChartOptions(dataType) {
+
+    var series = [];
+    var valueAxisPrefix = "";
+
+    if (dataType === "price") {
+
+        valueAxisPrefix = "$";
+
+        series.push(
+        {
             type: 'candleStick',
             openValueField: 'open',
             highValueField: 'high',
@@ -214,13 +173,113 @@ function getChartOptions() {
             reduction: {
                 color: 'black'
             }
-        },
+        });
+    } else {
+        series.push(
         {
-            pane: 'volume',
             type: 'bar',
             valueField: 'volume',
-            argumentField: 'date'
-        }],
-        animation: { enabled: false }
+            argumentField:
+                'date'
+        });
+    }
+
+    return {
+        dataSource: days,
+        valueAxis: {
+            valueType: 'numeric',
+            placeholderSize: 30,
+            label: {
+                customizeText: function () {
+                    if (this.value > 1000000000) {
+                        return valueAxisPrefix.concat(this.value / 1000000000, "B");
+                    } else if (this.value > 1000000) {
+                        return valueAxisPrefix.concat(this.value / 1000000, "M");
+                    } else if (this.value > 1000) {
+                        return valueAxisPrefix.concat(this.value / 1000, "K");
+                    } else {
+                        return valueAxisPrefix.concat(this.value);
+                    }
+                }
+            }
+        },
+        scrollingMode: 'all',
+        zoomingMode: 'all',
+        scrollBar: {
+            visible: false
+        },
+        argumentAxis: {
+            valueMarginsEnabled: false,
+            grid: {
+                visible: true
+            },
+            label: {
+                visible: true
+            },
+            argumentType: 'datetime'
+        },
+        crosshair: {
+            enabled: true,
+            label: {
+                visible: true
+            }
+        },
+        tooltip: {
+            enabled: true,
+            location: "edge",
+            customizeText: function () {
+                if (!this.openValue) {
+                    return "Volume: " + this.value;
+                } else {
+                    return "Open: $" + this.openValue + "<br/>" +
+                        "Close: $" + this.closeValue + "<br/>" +
+                        "High: $" + this.highValue + "<br/>" +
+                        "Low: $" + this.lowValue + "<br/>";
+                }
+            }
+        },
+        legend: {
+            visible: false
+        },
+        useAggregation: true,
+        commonSeriesSettings: {
+            ignoreEmptyPoints: true
+        },
+        series: series,
+        animation: { enabled: false },
+        onDrawn: function (data) {
+            var ranges = data.component.businessRanges[0].arg;
+            if (ranges.minVisible && ranges.maxVisible)
+                updateZoom({ startValue: ranges.minVisible, endValue: ranges.maxVisible }, dataType);
+        }
     };
+}
+
+var priceBounds = {};
+var volumeBounds = {};
+var rangeBounds = {};
+
+function updateZoom(e, controlType) {
+
+    var bounds;
+
+    var price = $("#price").dxChart("instance");
+    bounds = price.businessRanges[0].arg;
+    if (controlType !== "price") {
+        if (bounds.minVisible !== e.startValue || bounds.maxVisible !== e.endValue)
+            price.zoomArgument(new Date(e.startValue), new Date(e.endValue));
+    } else {
+        priceBounds = e;
+    }
+
+    if (controlType !== "volume") {
+        var volume = $("#volume").dxChart("instance");
+        bounds = volume.businessRanges[0].arg;
+        if (bounds.minVisible !== e.startValue || bounds.maxVisible !== e.endValue)
+            volume.zoomArgument(new Date(e.startValue), new Date(e.endValue));
+    }
+    if (controlType !== "range") {
+        var range = $("#range").dxRangeSelector("instance");
+        range.setSelectedRange(e);
+    }
 }
