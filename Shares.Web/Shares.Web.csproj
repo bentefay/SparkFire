@@ -321,6 +321,7 @@
     <Content Include="Content\shares\devextreme\js\vectormap-utils\dx.vectormaputils.debug.js" />
     <Content Include="Content\shares\devextreme\js\vectormap-utils\dx.vectormaputils.js" />
     <Content Include="Content\shares\devextreme\js\vectormap-utils\dx.vectormaputils.node.js" />
+    <Content Include="Content\shares\index.css" />
     <Content Include="Content\shares\indexdx.js" />
     <Content Include="Content\shares\index.html" />
     <Content Include="Content\shares\index.js" />

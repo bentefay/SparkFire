@@ -12,7 +12,7 @@ namespace Shares.Web.Controllers
     {
         private static readonly string[] _eodFilePaths = { @"C:\Data\Dropbox\Git\ASX", @"D:\Mesh\Dropbox\Git\ASX" };
 
-        public ShareDto Get(string instrumentCode)
+        public ShareDto Get(string instrumentCode, ShareAggregateType aggregateType = ShareAggregateType.Day, int aggregateSize = 1, bool isRelative = true)
         {
             var eodFilePath = GetEodFilePath();
 
@@ -21,7 +21,9 @@ namespace Shares.Web.Controllers
             var parser = new EodParser();
             var share = parser.ParseFile(fullPath);
 
-            return new ShareDto(share);
+            share.Aggregate(aggregateType, aggregateSize, isRelative, DateTime.Now);
+
+            return new ShareDto(share);           
         }
 
         public List<string> GetAllInstrumentCodes()
@@ -67,7 +69,7 @@ namespace Shares.Web.Controllers
             public Single[] High { get; set; }
             public Single[] Low { get; set; }
             public Single[] Close { get; set; }
-            public Int32[] Volume { get; set; }
+            public UInt32[] Volume { get; set; }
             public UInt16[] OpenInt { get; set; }
         }
     }

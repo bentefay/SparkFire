@@ -29,7 +29,7 @@ namespace Shares.Model.Parsers
                     day.High = Single.Parse(cells[4]);
                     day.Low = Single.Parse(cells[5]);
                     day.Close = Single.Parse(cells[6]);
-                    day.Volume = Int32.Parse(cells[7]);
+                    day.Volume = UInt32.Parse(cells[7]);
                     day.OpenInt = UInt16.Parse(cells[8]);
 
                     days.Add(day);

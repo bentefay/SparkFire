@@ -1,0 +1,71 @@
+﻿.main {
+    padding: 50px 20px 20px;
+    box-sizing: border-box;
+    height: 100%;
+}
+
+.left-side, .right-side {
+    height: 100%;
+    background-color: #fff;
+    border: 1px solid #cfcfcf;
+    border-radius: 1px;
+    box-shadow: 0px 1px 4px 0px rgba(0,0,0,0.1);
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.left-side {
+    width: 180px;
+    float: left;
+    color: #848484;
+    font-size: 16px;
+    font-weight: normal;
+}
+
+.right-side {
+    margin-left: 200px;
+}
+
+#price {
+    height: 56%;
+    margin-bottom: 4%;
+}
+
+#volume {
+    height: 26%;
+    margin-bottom: 4%;
+}
+
+#range {
+    height: 8%;
+}
+
+    #range.chart-full, #price.chart-full, #volume.chart-full {
+        height: 100%;
+    }
+
+#instrumentCodes {
+    height: 100%;
+    margin-bottom: 6%;
+}
+
+#instrumentCode {
+    text-align: center;
+    font-size: 1.2em;
+    color: #5f5f5f;
+}
+
+.panel {
+    display: inline-block;
+}
+
+.panel {
+    float: right;
+    margin-right: 20px;
+    margin-top: 6px;
+}
+
+.panel .button {
+    display:inline-block;
+    vertical-align: middle;
+}

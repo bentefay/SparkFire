@@ -12,10 +12,20 @@ namespace Shares.Model
         public Single High { get; set; }
         public Single Low { get; set; }
         public Single Close { get; set; }
-        public Int32 Volume { get; set; }
+        public UInt32 Volume { get; set; }
         public UInt16 OpenInt { get; set; }
         public Byte[] Unknown2 { get; set; }
         public int Row { get; set; }
+
+        public ShareDay ShallowClone()
+        {
+            return (ShareDay) MemberwiseClone();
+        }
+
+        public ShareDay DeepClone()
+        {
+            return ShallowClone();
+        }
 
         public override string ToString()
         {

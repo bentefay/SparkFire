@@ -18,27 +18,87 @@ function onGetInstrumentCodes(data) {
         data[i] = { instrumentCode: data[i] };
     }
 
-    instrumentCodes(data);
+    instrumentCodesDataSource({ store: { data: data, type: 'array', key: 'instrumentCode' }});
 
     var grid = $("#instrumentCodes").dxDataGrid("instance");
 
-    var onContentReader = function () {
-        grid.selectRowsByIndexes([0]);
-        grid.off('contentReady', onContentReader);
+    var onContentReady = function () {
+        grid.selectRows(["NAB"], false);
+        grid.off('contentReady', onContentReady);
     };
 
-    grid.on('contentReady', onContentReader);
+    grid.on('contentReady', onContentReady);
 }
 
-function showInstrument(instrumentCode) {
+var model;
+var days;
+var instrumentCodesDataSource;
+
+function updateView(data) {
+    model.instrumentCodeTitle(data.raw.marketCode + " - " + data.raw.instrumentCode + " - " + data.raw.companyName);
+    days(data.days);
+}
+
+function initialiseView() {
+
+    model = {};
+
+    days = ko.observableArray();
+    instrumentCodesDataSource = ko.observable();
+    model.useAggregation = { text: 'Use aggregation?' };
+
+    model.priceOptions = getChartOptions('price');
+    model.volumeOptions = getChartOptions('volume');
+    model.rangeOptions = getRangeOptions();
+    model.instrumentCodeOptions = getInstrumentCodeOptions();
+    model.instrumentCodeTitle = ko.observable();
+
+    var aggregateTypes = ['Day', 'Week', 'Month', 'Quarter', 'Year'];
+    model.aggregateType = { items: aggregateTypes, value: ko.observable(aggregateTypes[0]), width: 'auto', min: 1 };
+
+    model.aggregateSize = { value: ko.observable(1) };
+    model.isRelative = { text: 'Relative To Now?', value: ko.observable(true) };
+
+    model.selectedInstrumentCode = ko.observable();
+
+    ko.computed(function () {
+        var params = {
+            instrumentCode: model.selectedInstrumentCode(),
+            aggregateType: model.aggregateType.value(),
+            aggregateSize: model.aggregateSize.value(),
+            isRelative: model.isRelative.value()
+        };
+        showInstrument(params);
+    }).extend({ rateLimit: 2000 });
+
+    ko.applyBindings(model);
+
+    showLoading();
+}
+
+function showInstrument(params) {
+
+    if (!params.instrumentCode) {
+        return;
+    }
+
+    showLoading();
+
+    var queryString = $.param(params);
 
     $.ajax({
         dataType: "json",
-        url: "../../api/shares?instrumentCode=" + instrumentCode,
+        url: "../../api/shares?" + queryString,
         success: onGetInstrumentData,
         error: (function (jqXhr, textStatus, errorThrown) {
         })
     });
+}
+
+function showLoading() {
+    $("#price").dxChart("instance").showLoadingIndicator();
+    $("#volume").dxChart("instance").showLoadingIndicator();
+    $("#range").dxRangeSelector("instance").showLoadingIndicator();
 }
 
 function onGetInstrumentData(data) {
@@ -62,35 +122,10 @@ function onGetInstrumentData(data) {
     });
 }
 
-var model;
-var days;
-var instrumentCodes;
-
-function updateView(data) {
-    model.instrumentCode(data.raw.marketCode + " - " + data.raw.instrumentCode + " - " + data.raw.companyName);
-    days(data.days);
-}
-
-function initialiseView() {
-
-    model = {};
-
-    days = ko.observableArray();
-    instrumentCodes = ko.observableArray();
-
-    model.priceOptions = getChartOptions('price');
-    model.volumeOptions = getChartOptions('volume');
-    model.rangeOptions = getRangeOptions();
-    model.instrumentCodeOptions = getInstrumentCodeOptions();
-    model.instrumentCode = ko.observable();
-
-    ko.applyBindings(model);
-}
-
 function getInstrumentCodeOptions() {
 
     return {
-        dataSource: instrumentCodes,
+        dataSource: instrumentCodesDataSource,
         loadPanel: false,
         scrolling: {
             mode: 'virtual'
@@ -109,7 +144,7 @@ function getInstrumentCodeOptions() {
         hoverStateEnabled: true,
         onSelectionChanged: function (selecteditems) {
             var data = selecteditems.selectedRowsData[0];
-            showInstrument(data.instrumentCode);
+            model.selectedInstrumentCode(data.instrumentCode);
         }
     }
 }
@@ -156,6 +191,7 @@ function getChartOptions(dataType) {
 
     var series = [];
     var valueAxisPrefix = "";
+    var customizeTooltipText;
 
     if (dataType === "price") {
 
@@ -174,6 +210,15 @@ function getChartOptions(dataType) {
                 color: 'black'
             }
         });
+
+        customizeTooltipText = function () {
+            return "<b>".concat(Globalize.format(this.argument, "dd/MM/yyyy"), "</b><br/>", 
+                "Open: $", this.openValue, "<br/>", 
+                "Close: $" + this.closeValue, "<br/>", 
+                "High: $", this.highValue, "<br/>", 
+                "Low: $", this.lowValue, "<br/>");
+        }
+
     } else {
         series.push(
         {
@@ -182,20 +227,24 @@ function getChartOptions(dataType) {
             argumentField:
                 'date'
         });
+
+        customizeTooltipText = function() {
+            return "<b>".concat(Globalize.format(this.argument, "dd/MM/yyyy"), "</b><br/>", "Volume: ", this.value);
+        }
     }
 
     return {
         dataSource: days,
         valueAxis: {
             valueType: 'numeric',
-            placeholderSize: 30,
+            placeholderSize: 40,
             label: {
                 customizeText: function () {
-                    if (this.value > 1000000000) {
+                    if (this.value >= 1000000000) {
                         return valueAxisPrefix.concat(this.value / 1000000000, "B");
-                    } else if (this.value > 1000000) {
+                    } else if (this.value >= 1000000) {
                         return valueAxisPrefix.concat(this.value / 1000000, "M");
-                    } else if (this.value > 1000) {
+                    } else if (this.value >= 1000) {
                         return valueAxisPrefix.concat(this.value / 1000, "K");
                     } else {
                         return valueAxisPrefix.concat(this.value);
@@ -219,7 +268,7 @@ function getChartOptions(dataType) {
             argumentType: 'datetime'
         },
         crosshair: {
-            enabled: true,
+            enabled: false,
             label: {
                 visible: true
             }
@@ -227,21 +276,14 @@ function getChartOptions(dataType) {
         tooltip: {
             enabled: true,
             location: "edge",
-            customizeText: function () {
-                if (!this.openValue) {
-                    return "Volume: " + this.value;
-                } else {
-                    return "Open: $" + this.openValue + "<br/>" +
-                        "Close: $" + this.closeValue + "<br/>" +
-                        "High: $" + this.highValue + "<br/>" +
-                        "Low: $" + this.lowValue + "<br/>";
-                }
-            }
+            customizeText: customizeTooltipText,
+            shadow: { opacity: 0.1 },
+            arrowLength: 30
         },
         legend: {
             visible: false
         },
-        useAggregation: true,
+        useAggregation: false,
         commonSeriesSettings: {
             ignoreEmptyPoints: true
         },
@@ -251,7 +293,8 @@ function getChartOptions(dataType) {
             var ranges = data.component.businessRanges[0].arg;
             if (ranges.minVisible && ranges.maxVisible)
                 updateZoom({ startValue: ranges.minVisible, endValue: ranges.maxVisible }, dataType);
-        }
+        },
+        loadingIndicator: { show: true }
     };
 }
 

@@ -85,7 +85,7 @@ namespace Shares.Model.Parsers
                 day.High = r.ReadSingle();
                 day.Low = r.ReadSingle();
                 day.Close = r.ReadSingle();
-                day.Volume = r.ReadInt32();
+                day.Volume = r.ReadUInt32();
                 day.OpenInt = r.ReadUInt16();
                 day.Unknown2 = r.ReadBytes(2);
                 Assert(day.Unknown2.Sum(b => b) == 0);
