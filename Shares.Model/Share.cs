@@ -103,7 +103,7 @@ namespace Shares.Model
                     return d1 => GetDaysFromZero(new DateTime(d1.Year, d1.Month, 1));
                 case ShareAggregateType.Quarter:
                     if (isRelative) return d1 => (int)((GetDaysFromZero(today) - GetDaysFromZero(d1)) / (DaysInAQuarter * aggregateSize));
-                    return d1 => GetDaysFromZero(new DateTime(d1.Year, (d1.Month / 4) * 4, 1));
+                    return d1 => GetDaysFromZero(new DateTime(d1.Year, ((d1.Month - 1) / 3) * 3 + 1, 1));
                 case ShareAggregateType.Year:
                     if (isRelative) return d1 => (int)((GetDaysFromZero(today) - GetDaysFromZero(d1)) / (DaysInAYear * aggregateSize));
                     return d1 => GetDaysFromZero(new DateTime(d1.Year, 1, 1));

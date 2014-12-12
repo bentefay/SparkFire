@@ -39,9 +39,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Indicators\AverageTrueRangeIndicator.cs" />
+    <Compile Include="Indicators\Metadata\IndicatorInfo.cs" />
+    <Compile Include="Indicators\Metadata\IndicatorParameterInfo.cs" />
+    <Compile Include="Indicators\Metadata\IndicatorInfoAggregator.cs" />
     <Compile Include="Parsers\CsvParser.cs" />
     <Compile Include="Parsers\EodParser.cs" />
     <Compile Include="Parsers\PrototypeEodParser.cs" />
+    <Compile Include="Point.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Share.cs" />
     <Compile Include="ShareDay.cs" />

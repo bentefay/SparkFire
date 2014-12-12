@@ -1,4 +1,12 @@
 ﻿
+var model;
+
+var priceInstance;
+var volumeInstance;
+var rangeInstance;
+var instrumentCodesInstance;
+var indicatorsInstance;
+
 $(document).ready(initialisePage);
 
 function initialisePage() {
@@ -7,44 +15,29 @@ function initialisePage() {
 
     $.ajax({
         dataType: "json",
-        url: "../../api/shares/allinstrumentcodes",
+        url: "../../api/instrumentCodes",
         success: onGetInstrumentCodes
+    });
+
+    $.ajax({
+        dataType: "json",
+        url: "../../api/indicators",
+        success: onGetIndicators
     });
 }
 
-function onGetInstrumentCodes(data) {
-
-    for (var i = 0; i < data.length; i++) {
-        data[i] = { instrumentCode: data[i] };
-    }
-
-    instrumentCodesDataSource({ store: { data: data, type: 'array', key: 'instrumentCode' }});
-
-    var grid = $("#instrumentCodes").dxDataGrid("instance");
-
-    var onContentReady = function () {
-        grid.selectRows(["NAB"], false);
-        grid.off('contentReady', onContentReady);
-    };
-
-    grid.on('contentReady', onContentReady);
-}
-
-var model;
-var days;
-var instrumentCodesDataSource;
-
 function updateView(data) {
     model.instrumentCodeTitle(data.raw.marketCode + " - " + data.raw.instrumentCode + " - " + data.raw.companyName);
-    days(data.days);
+    model.days(data.days);
 }
 
 function initialiseView() {
 
     model = {};
 
-    days = ko.observableArray();
-    instrumentCodesDataSource = ko.observable();
+    model.days = ko.observableArray();
+    model.instrumentCodesDataSource = ko.observable();
+    model.indicatorsDataSource = ko.observable();
     model.useAggregation = { text: 'Use aggregation?' };
 
     model.priceOptions = getChartOptions('price');
@@ -52,6 +45,7 @@ function initialiseView() {
     model.rangeOptions = getRangeOptions();
     model.instrumentCodeOptions = getInstrumentCodeOptions();
     model.instrumentCodeTitle = ko.observable();
+    model.indicators = getIndicatorOptions();
 
     var aggregateTypes = ['Day', 'Week', 'Month', 'Quarter', 'Year'];
     model.aggregateType = { items: aggregateTypes, value: ko.observable(aggregateTypes[0]), width: 'auto', min: 1 };
@@ -73,6 +67,12 @@ function initialiseView() {
 
     ko.applyBindings(model);
 
+    priceInstance = $("#price").dxChart("instance");
+    volumeInstance = $("#volume").dxChart("instance");
+    rangeInstance = $("#range").dxRangeSelector("instance");
+    instrumentCodesInstance = $("#instrumentCodes").dxDataGrid("instance");
+    indicatorsInstance = $("#indicators").dxDataGrid("instance");
+
     showLoading();
 }
 
@@ -84,11 +84,10 @@ function showInstrument(params) {
 
     showLoading();
 
-    var queryString = $.param(params);
-
     $.ajax({
         dataType: "json",
-        url: "../../api/shares?" + queryString,
+        url: "../../api/instrumentData",
+        data: params,
         success: onGetInstrumentData,
         error: (function (jqXhr, textStatus, errorThrown) {
         })
@@ -96,9 +95,9 @@ function showInstrument(params) {
 }
 
 function showLoading() {
-    $("#price").dxChart("instance").showLoadingIndicator();
-    $("#volume").dxChart("instance").showLoadingIndicator();
-    $("#range").dxRangeSelector("instance").showLoadingIndicator();
+    priceInstance.showLoadingIndicator();
+    volumeInstance.showLoadingIndicator();
+    rangeInstance.showLoadingIndicator();
 }
 
 function onGetInstrumentData(data) {
@@ -122,11 +121,22 @@ function onGetInstrumentData(data) {
     });
 }
 
+function onGetInstrumentCodes(data) {
+
+    for (var i = 0; i < data.length; i++) {
+        data[i] = { instrumentCode: data[i] };
+    }
+
+    model.instrumentCodesDataSource({ store: { data: data, type: 'array', key: 'instrumentCode' } });
+
+    instrumentCodesInstance.selectRows(["NAB"], false);
+}
+
 function getInstrumentCodeOptions() {
 
     return {
-        dataSource: instrumentCodesDataSource,
-        loadPanel: false,
+        dataSource: model.instrumentCodesDataSource,
+        loadPanel: true,
         scrolling: {
             mode: 'virtual'
         },
@@ -149,9 +159,57 @@ function getInstrumentCodeOptions() {
     }
 }
 
+function onGetIndicators(data) {
+
+    for (var i = 0; i < data.length; i++) {
+        data[i].isPlotted = false;
+    }
+
+    model.indicatorsDataSource({ store: { data: data, type: 'array', key: 'displayName' } });
+}
+
+function getIndicatorOptions() {
+
+    return {
+        dataSource: model.indicatorsDataSource,
+        loadPanel: true,
+        showColumnLines: false,
+        columns: [
+            { dataField: 'isPlotted', allowFiltering: false, width: 30, allowEditing: true },
+            { dataField: 'displayName', allowEditing: false }
+        ],
+        scrolling: {
+            mode: 'virtual'
+        },
+        editing: {
+            editEnabled: true,
+            editMode: 'cell'
+        },
+        selection: {
+            mode: 'single'
+        },
+        sorting: {
+            mode: "none"
+        },
+        filterRow: {
+            visible: false,
+            applyFilter: "auto"
+        },
+        searchPanel: {
+            visible: true,
+            width: 130
+        },
+        showColumnHeaders: false,
+        hoverStateEnabled: true,
+        onSelectionChanged: function (selecteditems) {
+            var data = selecteditems.selectedRowsData[0];
+        }
+    }
+}
+
 function getRangeOptions() {
     return {
-        dataSource: days,
+        dataSource: model.days,
         chart: {
             useAggregation: true,
             valueAxis: { valueType: 'numeric' },
@@ -234,7 +292,7 @@ function getChartOptions(dataType) {
     }
 
     return {
-        dataSource: days,
+        dataSource: model.days,
         valueAxis: {
             valueType: 'numeric',
             placeholderSize: 40,
@@ -320,24 +378,21 @@ function updateZoom(e, controlType) {
     }, 500);
 
     if (controlType !== "price") {
-        var price = $("#price").dxChart("instance");
-        bounds = price.businessRanges[0].arg;
+        bounds = priceInstance.businessRanges[0].arg;
         if (!boundsEqual(e, bounds.minVisible, bounds.maxVisible))
-            price.zoomArgument(new Date(e.startValue), new Date(e.endValue));
+            priceInstance.zoomArgument(new Date(e.startValue), new Date(e.endValue));
     }
 
     if (controlType !== "volume") {
-        var volume = $("#volume").dxChart("instance");
-        bounds = volume.businessRanges[0].arg;
+        bounds = volumeInstance.businessRanges[0].arg;
         if (!boundsEqual(e, bounds.minVisible, bounds.maxVisible))
-            volume.zoomArgument(new Date(e.startValue), new Date(e.endValue));
+            volumeInstance.zoomArgument(new Date(e.startValue), new Date(e.endValue));
     }
 
     if (controlType !== "range") {
-        var range = $("#range").dxRangeSelector("instance");
-        bounds = range.getSelectedRange();
+        bounds = rangeInstance.getSelectedRange();
         if (!boundsEqual(e, bounds.startValue, bounds.endValue))
-            range.setSelectedRange(e);
+            rangeInstance.setSelectedRange(e);
     }
 }
 

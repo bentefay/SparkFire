@@ -45,7 +45,12 @@
     }
 
 #instrumentCodes {
-    height: 100%;
+    height: 50%;
+    margin-bottom: 6%;
+}
+
+#indicators {
+    height: 50%;
     margin-bottom: 6%;
 }
 

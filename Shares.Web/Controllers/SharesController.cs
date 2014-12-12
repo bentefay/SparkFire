@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Web.Http;
 using Shares.Model;
+using Shares.Model.Indicators;
+using Shares.Model.Indicators.Metadata;
 using Shares.Model.Parsers;
 
 namespace Shares.Web.Controllers
@@ -12,20 +14,47 @@ namespace Shares.Web.Controllers
     {
         private static readonly string[] _eodFilePaths = { @"C:\Data\Dropbox\Git\ASX", @"D:\Mesh\Dropbox\Git\ASX" };
 
-        public ShareDto Get(string instrumentCode, ShareAggregateType aggregateType = ShareAggregateType.Day, int aggregateSize = 1, bool isRelative = true)
+        [Route("api/instrumentData")]
+        public ShareDto Get([FromUri] ShareDataRequest request)
+        {
+            if (request == null || request.InstrumentCode == null)
+                throw new ArgumentException();
+
+            return new ShareDto(GetShareData(request));
+        }
+
+        private Share GetShareData([FromUri] ShareDataRequest request)
         {
             var eodFilePath = GetEodFilePath();
 
-            var fullPath = Path.Combine(eodFilePath, Path.ChangeExtension(instrumentCode, "eod"));
+            var fullPath = Path.Combine(eodFilePath, Path.ChangeExtension(request.InstrumentCode, "eod"));
 
             var parser = new EodParser();
             var share = parser.ParseFile(fullPath);
 
-            share.Aggregate(aggregateType, aggregateSize, isRelative, DateTime.Now);
+            share.Aggregate(request.AggregateType, request.AggregateSize, request.IsRelative, DateTime.Now);
 
-            return new ShareDto(share);           
+            return share;           
         }
 
+        private readonly IndicatorInfoAggregator _indicatorInfoAggregator = new IndicatorInfoAggregator()
+            .AddIndicator<AverageTrueRangeIndicator, AverageTrueRangeIndicatorParameters>("ATR");
+
+        [Route("api/indicators")]
+        public List<IndicatorInfo> GetAllIndicators()
+        {
+            return _indicatorInfoAggregator.GetIndicatorInfos();
+        }
+
+        [Route("api/indicator/averageTrueRange")]
+        public IEnumerable<Point<float>> GetAverageTrueRangeIndicator([FromUri] ShareDataRequest request, [FromUri] AverageTrueRangeIndicatorParameters parameters)
+        {
+            var share = GetShareData(request);
+
+            return new AverageTrueRangeIndicator().Calculate(share.Days, 0, parameters);
+        }
+
+        [Route("api/instrumentCodes")]
         public List<string> GetAllInstrumentCodes()
         {
             var eodFilePath = GetEodFilePath();
@@ -42,6 +71,21 @@ namespace Shares.Web.Controllers
                     return filePath;
 
             throw new Exception("None of the specified paths exist.");
+        }
+
+        public class ShareDataRequest
+        {
+            public string InstrumentCode { get; set; }
+            public ShareAggregateType AggregateType { get; set; }
+            public int AggregateSize { get; set; }
+            public bool IsRelative { get; set; }
+
+            public ShareDataRequest()
+            {
+                AggregateType = ShareAggregateType.Day;
+                AggregateSize = 1;
+                IsRelative = true;
+            }
         }
 
         public class ShareDto
