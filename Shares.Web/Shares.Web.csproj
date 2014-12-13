@@ -322,9 +322,8 @@
     <Content Include="Content\shares\devextreme\js\vectormap-utils\dx.vectormaputils.js" />
     <Content Include="Content\shares\devextreme\js\vectormap-utils\dx.vectormaputils.node.js" />
     <Content Include="Content\shares\index.css" />
-    <Content Include="Content\shares\indexdx.js" />
-    <Content Include="Content\shares\index.html" />
     <Content Include="Content\shares\index.js" />
+    <Content Include="Content\shares\index.html" />
     <Content Include="Content\shares\kendo\js\angular.min.js" />
     <Content Include="Content\shares\kendo\js\cultures\kendo.culture.af-ZA.min.js" />
     <Content Include="Content\shares\kendo\js\cultures\kendo.culture.af.min.js" />
