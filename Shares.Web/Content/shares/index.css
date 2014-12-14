@@ -26,23 +26,28 @@
     margin-left: 200px;
 }
 
-#price {
-    height: 56%;
-    margin-bottom: 4%;
-}
-
-#volume {
-    height: 26%;
-    margin-bottom: 4%;
+.right-side .charts {
+    height: 82%;
+    margin-bottom: 3%;
 }
 
 #range {
-    height: 8%;
+    height: 10%;
 }
 
-    #range.chart-full, #price.chart-full, #volume.chart-full {
-        height: 100%;
-    }
+#price {
+    height: 74%;
+    margin-bottom: 1%;
+}
+
+#volume {
+    height: 24%;
+    margin-bottom: 1%;
+}
+
+#range.chart-full, #price.chart-full, #volume.chart-full {
+    height: 100%;
+}
 
 #instrumentCodes {
     height: 50%;

@@ -41,15 +41,16 @@ function initialiseView() {
     model.indicatorsDataSource = ko.observable();
     model.useAggregation = { text: 'Use aggregation?' };
 
-    model.priceOptions = getChartOptions('price');
-    model.volumeOptions = getChartOptions('volume');
+    model.chartOptionsCollection = [{ options: getChartOptions('price'), id: 'price' },
+        { options: getChartOptions('volume'), id: 'volume' }];
+
     model.rangeOptions = getRangeOptions();
     model.instrumentCodeOptions = getInstrumentCodeOptions();
     model.instrumentCodeTitle = ko.observable();
     model.indicators = getIndicatorOptions();
 
     var aggregateTypes = ['Day', 'Week', 'Month', 'Quarter', 'Year'];
-    model.aggregateType = { items: aggregateTypes, value: ko.observable(aggregateTypes[0]), width: 'auto', min: 1 };
+    model.aggregateType = { items: aggregateTypes, value: ko.observable(aggregateTypes[3]), width: 'auto', min: 1 };
 
     model.aggregateSize = { value: ko.observable(1) };
     model.isRelative = { text: 'Relative To Now?', value: ko.observable(true) };
