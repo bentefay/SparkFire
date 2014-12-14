@@ -6,6 +6,7 @@ var volumeInstance;
 var rangeInstance;
 var instrumentCodesInstance;
 var indicatorsInstance;
+var xAxisSyncer;
 
 $(document).ready(initialisePage);
 
@@ -74,6 +75,9 @@ function initialiseView() {
     indicatorsInstance = $("#indicators").dxDataGrid("instance");
 
     showLoading();
+
+    xAxisSyncer = new _shares.XAxisSyncer();
+    xAxisSyncer.add([priceInstance, volumeInstance, rangeInstance]);
 }
 
 function showInstrument(params) {
@@ -234,7 +238,6 @@ function getRangeOptions() {
             allowSlidersSwap: false,
             animation: false
         },
-        selectedRangeChanged: function(e) { updateZoom(e, 'range'); },
         sliderMarker: { visible: false },
         margin: {
             right: 0,
@@ -347,59 +350,6 @@ function getChartOptions(dataType) {
         },
         series: series,
         animation: { enabled: false },
-        onDrawn: function (data) {
-            var ranges = data.component.businessRanges[0].arg;
-            if (ranges.minVisible && ranges.maxVisible)
-                updateZoom({ startValue: ranges.minVisible, endValue: ranges.maxVisible }, dataType);
-        },
         loadingIndicator: { show: true }
     };
-}
-
-var leader = null;
-var timerId = null;
-
-function updateZoom(e, controlType) {
-
-    var bounds;
-
-    if (leader === null) {
-        leader = controlType;
-    } else if (controlType !== leader) {
-        return;
-    }
-
-    if (timerId !== null)
-        clearTimeout(timerId);
-
-    timerId = setTimeout(function () {
-        leader = null;
-        timerId = null;
-    }, 500);
-
-    if (controlType !== "price") {
-        bounds = priceInstance.businessRanges[0].arg;
-        if (!boundsEqual(e, bounds.minVisible, bounds.maxVisible))
-            priceInstance.zoomArgument(new Date(e.startValue), new Date(e.endValue));
-    }
-
-    if (controlType !== "volume") {
-        bounds = volumeInstance.businessRanges[0].arg;
-        if (!boundsEqual(e, bounds.minVisible, bounds.maxVisible))
-            volumeInstance.zoomArgument(new Date(e.startValue), new Date(e.endValue));
-    }
-
-    if (controlType !== "range") {
-        bounds = rangeInstance.getSelectedRange();
-        if (!boundsEqual(e, bounds.startValue, bounds.endValue))
-            rangeInstance.setSelectedRange(e);
-    }
-}
-
-function boundsEqual(e, startValue, endValue) {
-
-    if (!startValue || !endValue || !e.startValue || !e.endValue)
-        return false;
-
-    return startValue.getTime() === e.startValue.getTime() && endValue.getTime() === e.endValue.getTime();
 }
