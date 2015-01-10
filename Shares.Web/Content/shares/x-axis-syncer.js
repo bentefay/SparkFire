@@ -38,6 +38,7 @@ _shares.XAxisSyncer = (function () {
                 instanceDescriptor.remove = function () {
                     this.instance.off('drawn');
                 }
+
             } else if (instance.setSelectedRange) {
                 // dxRangeSelector
                 instance.on('selectedRangeChanged', function (args) {

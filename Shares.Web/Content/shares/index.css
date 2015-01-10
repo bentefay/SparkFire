@@ -36,7 +36,7 @@
 }
 
 #price {
-    height: 74%;
+    height: 54%;
     margin-bottom: 1%;
 }
 
@@ -45,7 +45,12 @@
     margin-bottom: 1%;
 }
 
-#range.chart-full, #price.chart-full, #volume.chart-full {
+#ATR {
+    height: 20%;
+    margin-bottom: 1%;
+}
+
+.chart-full {
     height: 100%;
 }
 
@@ -60,7 +65,7 @@
 }
 
 #instrumentCode {
-    text-align: center;
+    text-align: left;
     font-size: 1.2em;
     color: #5f5f5f;
 }

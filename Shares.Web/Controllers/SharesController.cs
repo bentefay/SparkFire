@@ -47,7 +47,7 @@ namespace Shares.Web.Controllers
         }
 
         [Route("api/indicator/averageTrueRange")]
-        public IEnumerable<Point<float>> GetAverageTrueRangeIndicator([FromUri] ShareDataRequest request, [FromUri] AverageTrueRangeIndicatorParameters parameters)
+        public IEnumerable<Point<Decimal>> GetAverageTrueRangeIndicator([FromUri] ShareDataRequest request, [FromUri] AverageTrueRangeIndicatorParameters parameters)
         {
             var share = GetShareData(request);
 
@@ -109,10 +109,10 @@ namespace Shares.Web.Controllers
             public string CompanyName { get; set; }
 
             public DateTime[] Date { get; set; }
-            public Single[] Open { get; set; }
-            public Single[] High { get; set; }
-            public Single[] Low { get; set; }
-            public Single[] Close { get; set; }
+            public Decimal[] Open { get; set; }
+            public Decimal[] High { get; set; }
+            public Decimal[] Low { get; set; }
+            public Decimal[] Close { get; set; }
             public UInt32[] Volume { get; set; }
             public UInt16[] OpenInt { get; set; }
         }

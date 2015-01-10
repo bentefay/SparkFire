@@ -19,7 +19,7 @@ namespace Shares.Model.Indicators
 
     public class AverageTrueRangeIndicator
     {
-        public IEnumerable<Point<float>> Calculate(ShareDay[] days, int startIndex, AverageTrueRangeIndicatorParameters p)
+        public IEnumerable<Point<decimal>> Calculate(ShareDay[] days, int startIndex, AverageTrueRangeIndicatorParameters p)
         {
             if (startIndex + p.NSmoothingPeriods > days.Length)
                 yield break;
@@ -32,12 +32,12 @@ namespace Shares.Model.Indicators
 
             foreach (var trueRange in trueRanges.Skip(p.NSmoothingPeriods))
             {
-                averageTrueRange = averageTrueRange * (p.NSmoothingPeriods - 1) + trueRange.Value;
+                averageTrueRange = (averageTrueRange * (p.NSmoothingPeriods - 1) + trueRange.Value) / p.NSmoothingPeriods;
                 yield return Point.With(trueRange.DateTime, averageTrueRange);
             }
         }
 
-        public IEnumerable<Point<float>> GetTrueRanges(ShareDay[] days, int startIndex)
+        public IEnumerable<Point<decimal>> GetTrueRanges(ShareDay[] days, int startIndex)
         {
             if (startIndex >= days.Length)
                 yield break;

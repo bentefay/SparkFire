@@ -81,10 +81,10 @@ namespace Shares.Model.Parsers
                 day.Unknown1 = r.ReadByte();
                 Assert(day.Unknown1 == 0);
                 day.Date = ReadDate(r);
-                day.Open = r.ReadSingle();
-                day.High = r.ReadSingle();
-                day.Low = r.ReadSingle();
-                day.Close = r.ReadSingle();
+                day.Open = (decimal)r.ReadSingle();
+                day.High = (decimal)r.ReadSingle();
+                day.Low = (decimal)r.ReadSingle();
+                day.Close = (decimal)r.ReadSingle();
                 day.Volume = r.ReadUInt32();
                 day.OpenInt = r.ReadUInt16();
                 day.Unknown2 = r.ReadBytes(2);

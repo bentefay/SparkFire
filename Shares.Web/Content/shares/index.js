@@ -1,9 +1,7 @@
 ﻿
 var model;
 
-var priceInstance;
-var volumeInstance;
-var rangeInstance;
+var chartInstances = [];
 var instrumentCodesInstance;
 var indicatorsInstance;
 var xAxisSyncer;
@@ -37,12 +35,15 @@ function initialiseView() {
     model = {};
 
     model.days = ko.observableArray();
+    model.indicatorData = {};
     model.instrumentCodesDataSource = ko.observable();
     model.indicatorsDataSource = ko.observable();
     model.useAggregation = { text: 'Use aggregation?' };
 
-    model.chartOptionsCollection = [{ options: getChartOptions('price'), id: 'price' },
-        { options: getChartOptions('volume'), id: 'volume' }];
+    model.chartOptionsCollection = ko.observableArray([
+        { options: getChartOptions('price'), id: 'price' },
+        { options: getChartOptions('volume'), id: 'volume' }
+    ]);
 
     model.rangeOptions = getRangeOptions();
     model.instrumentCodeOptions = getInstrumentCodeOptions();
@@ -58,25 +59,26 @@ function initialiseView() {
     model.selectedInstrumentCode = ko.observable();
 
     ko.computed(function () {
-        var params = constructInstructCodeRequestParams();
+        var params = constructInstrumentCodeRequestParams();
         showInstrument(params);
     }).extend({ rateLimit: 2000 });
 
     ko.applyBindings(model);
 
-    priceInstance = $("#price").dxChart("instance");
-    volumeInstance = $("#volume").dxChart("instance");
-    rangeInstance = $("#range").dxRangeSelector("instance");
+    chartInstances.push($("#price").dxChart("instance"));
+    chartInstances.push($("#volume").dxChart("instance"));
+    chartInstances.push($("#range").dxRangeSelector("instance"));
+
     instrumentCodesInstance = $("#instrumentCodes").dxDataGrid("instance");
     indicatorsInstance = $("#indicators").dxDataGrid("instance");
 
     showLoading();
 
     xAxisSyncer = new _shares.XAxisSyncer();
-    xAxisSyncer.add([priceInstance, volumeInstance, rangeInstance]);
+    xAxisSyncer.add(chartInstances);
 }
 
-function constructInstructCodeRequestParams() {
+function constructInstrumentCodeRequestParams() {
     var params = {
         instrumentCode: model.selectedInstrumentCode(),
         aggregateType: model.aggregateType.value(),
@@ -105,9 +107,9 @@ function showInstrument(params) {
 }
 
 function showLoading() {
-    priceInstance.showLoadingIndicator();
-    volumeInstance.showLoadingIndicator();
-    rangeInstance.showLoadingIndicator();
+    for (var i = 0; i < chartInstances.length; i++) {
+        chartInstances[i].showLoadingIndicator();
+    }
 }
 
 function onGetInstrumentData(data) {
@@ -182,7 +184,7 @@ function onGetIndicators(data) {
         onUpdated: function(key) {
             arrayStore.byKey(key).done(function (dataItem) {
 
-                var params = constructInstructCodeRequestParams();
+                var params = constructInstrumentCodeRequestParams();
                 params = _(params).extend(dataItem.defaultParameterObject);
 
                 $.ajax({
@@ -190,7 +192,12 @@ function onGetIndicators(data) {
                     url: "../../api/indicator/" + dataItem.name,
                     data: params,
                     success: function(data) {
-                        
+
+                        model.indicatorData[key] = ko.observableArray(data);
+                        model.chartOptionsCollection.push({ options: getChartOptions(key), id: key });
+                        var instance = $("#" + key).dxChart("instance");
+                        xAxisSyncer.add([instance]);
+
                     }
                 });
             });
@@ -282,52 +289,78 @@ function getRangeOptions() {
 
 function getChartOptions(dataType) {
 
-    var series = [];
+    var series;
     var valueAxisPrefix = "";
     var customizeTooltipText;
+    var dataSource = model.days;
 
-    if (dataType === "price") {
-
+    switch (dataType) {
+    case "price":
         valueAxisPrefix = "$";
 
-        series.push(
-        {
-            type: 'candleStick',
-            openValueField: 'open',
-            highValueField: 'high',
-            lowValueField: 'low',
-            closeValueField: 'close',
-            argumentField: 'date',
-            color: 'black',
-            reduction: {
-                color: 'black'
+        series = [
+            {
+                type: 'candleStick',
+                openValueField: 'open',
+                highValueField: 'high',
+                lowValueField: 'low',
+                closeValueField: 'close',
+                argumentField: 'date',
+                color: 'black',
+                reduction: {
+                    color: 'black'
+                }
             }
-        });
+        ];
 
-        customizeTooltipText = function () {
-            return "<b>".concat(Globalize.format(this.argument, "dd/MM/yyyy"), "</b><br/>", 
-                "Open: $", this.openValue, "<br/>", 
-                "Close: $" + this.closeValue, "<br/>", 
-                "High: $", this.highValue, "<br/>", 
+        customizeTooltipText = function() {
+            return "<b>".concat(Globalize.format(this.argument, "dd/MM/yyyy"), "</b><br/>",
+                "Open: $", this.openValue, "<br/>",
+                "Close: $" + this.closeValue, "<br/>",
+                "High: $", this.highValue, "<br/>",
                 "Low: $", this.lowValue, "<br/>");
         }
+        break;
 
-    } else {
-        series.push(
-        {
-            type: 'bar',
-            valueField: 'volume',
-            argumentField:
-                'date'
-        });
+    case "volume":
+        series = [
+            {
+                type: 'bar',
+                valueField: 'volume',
+                argumentField:
+                    'date'
+            }
+        ];
 
         customizeTooltipText = function() {
             return "<b>".concat(Globalize.format(this.argument, "dd/MM/yyyy"), "</b><br/>", "Volume: ", this.value);
         }
+        break;
+
+    case "ATR":
+
+        dataSource = model.indicatorData["ATR"];
+
+        series = [
+            {
+                type: 'bar',
+                valueField: 'value',
+                argumentField:
+                    'dateTime'
+            }
+        ];
+
+        customizeTooltipText = function () {
+            return "<b>".concat(Globalize.format(this.argument, "dd/MM/yyyy"), "</b><br/>", "ATR: ", this.value);
+        }
+        break;
+
+    default:
+        break;
     }
 
     return {
-        dataSource: model.days,
+        dataSource: dataSource,
         valueAxis: {
             valueType: 'numeric',
             placeholderSize: 40,

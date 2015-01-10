@@ -25,10 +25,10 @@ namespace Shares.Model.Parsers
                     var day = new ShareDay();
 
                     day.Date = DateTime.ParseExact(cells[2], "yyyyMMdd", CultureInfo.CurrentCulture);
-                    day.Open = Single.Parse(cells[3]);
-                    day.High = Single.Parse(cells[4]);
-                    day.Low = Single.Parse(cells[5]);
-                    day.Close = Single.Parse(cells[6]);
+                    day.Open = Decimal.Parse(cells[3]);
+                    day.High = Decimal.Parse(cells[4]);
+                    day.Low = Decimal.Parse(cells[5]);
+                    day.Close = Decimal.Parse(cells[6]);
                     day.Volume = UInt32.Parse(cells[7]);
                     day.OpenInt = UInt16.Parse(cells[8]);
 

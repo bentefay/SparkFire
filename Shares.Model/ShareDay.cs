@@ -8,10 +8,10 @@ namespace Shares.Model
         public Tf Tf { get; set; }
         public Byte Unknown1 { get; set; }
         public DateTime Date { get; set; }
-        public Single Open { get; set; }
-        public Single High { get; set; }
-        public Single Low { get; set; }
-        public Single Close { get; set; }
+        public Decimal Open { get; set; }
+        public Decimal High { get; set; }
+        public Decimal Low { get; set; }
+        public Decimal Close { get; set; }
         public UInt32 Volume { get; set; }
         public UInt16 OpenInt { get; set; }
         public Byte[] Unknown2 { get; set; }
