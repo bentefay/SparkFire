@@ -9,7 +9,8 @@ namespace Shares.Model.Indicators.Metadata
     {
         private readonly List<IndicatorInfo> _indicatorInfos = new List<IndicatorInfo>(); 
 
-        public IndicatorInfoAggregator AddIndicator<TIndicator, TIndicatorParameters>(string displayName = null, string graphGroup = null)
+        public IndicatorInfoAggregator AddIndicator<TIndicator, TIndicatorParameters>(string displayName = null, string graphGroup = null) 
+            where TIndicatorParameters : new()
         {
             var indicatorInfo = new IndicatorInfo();
 
@@ -20,6 +21,7 @@ namespace Shares.Model.Indicators.Metadata
             indicatorInfo.Name = name;
             indicatorInfo.GraphGroup = graphGroup ?? name;
             indicatorInfo.DisplayName = displayName ?? name;
+            indicatorInfo.DefaultParameterObject = new TIndicatorParameters();
             indicatorInfo.ParameterInfos = new List<IndicatorParameterInfo>();
 
             foreach (var parameter in typeof(TIndicatorParameters).GetProperties())

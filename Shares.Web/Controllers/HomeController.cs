@@ -12,7 +12,7 @@ namespace Shares.Web.Controllers
         {
             ViewBag.Title = "Home Page";
 
-            return View();
+            return Redirect("Content/shares");
         }
     }
 }

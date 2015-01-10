@@ -8,5 +8,6 @@ namespace Shares.Model.Indicators.Metadata
         public string DisplayName { get; set; }
         public string GraphGroup { get; set; }
         public List<IndicatorParameterInfo> ParameterInfos { get; set; }
+        public object DefaultParameterObject { get; set; }
     }
 }

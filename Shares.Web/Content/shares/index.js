@@ -58,12 +58,7 @@ function initialiseView() {
     model.selectedInstrumentCode = ko.observable();
 
     ko.computed(function () {
-        var params = {
-            instrumentCode: model.selectedInstrumentCode(),
-            aggregateType: model.aggregateType.value(),
-            aggregateSize: model.aggregateSize.value(),
-            isRelative: model.isRelative.value()
-        };
+        var params = constructInstructCodeRequestParams();
         showInstrument(params);
     }).extend({ rateLimit: 2000 });
 
@@ -79,6 +74,16 @@ function initialiseView() {
 
     xAxisSyncer = new _shares.XAxisSyncer();
     xAxisSyncer.add([priceInstance, volumeInstance, rangeInstance]);
+}
+
+function constructInstructCodeRequestParams() {
+    var params = {
+        instrumentCode: model.selectedInstrumentCode(),
+        aggregateType: model.aggregateType.value(),
+        aggregateSize: model.aggregateSize.value(),
+        isRelative: model.isRelative.value()
+    };
+    return params;
 }
 
 function showInstrument(params) {
@@ -135,6 +140,7 @@ function onGetInstrumentCodes(data) {
     model.instrumentCodesDataSource({ store: { data: data, type: 'array', key: 'instrumentCode' } });
 
     instrumentCodesInstance.selectRows(["NAB"], false);
+
 }
 
 function getInstrumentCodeOptions() {
@@ -157,8 +163,8 @@ function getInstrumentCodeOptions() {
         },
         showColumnHeaders: false,
         hoverStateEnabled: true,
-        onSelectionChanged: function (selecteditems) {
-            var data = selecteditems.selectedRowsData[0];
+        onSelectionChanged: function (options) {
+            var data = options.selectedRowsData[0];
             model.selectedInstrumentCode(data.instrumentCode);
         }
     }
@@ -170,7 +176,30 @@ function onGetIndicators(data) {
         data[i].isPlotted = false;
     }
 
-    model.indicatorsDataSource({ store: { data: data, type: 'array', key: 'displayName' } });
+    var arrayStore = new DevExpress.data.ArrayStore({
+        data: data,
+        key: 'displayName',
+        onUpdated: function(key) {
+            arrayStore.byKey(key).done(function (dataItem) {
+
+                var params = constructInstructCodeRequestParams();
+                params = _(params).extend(dataItem.defaultParameterObject);
+
+                $.ajax({
+                    dataType: "json",
+                    url: "../../api/indicator/" + dataItem.name,
+                    data: params,
+                    success: function(data) {
+                        
+                    }
+                });
+            });
+        }
+    });
+
+    model.indicatorsDataSource({
+        store: arrayStore
+    });
 }
 
 function getIndicatorOptions() {
@@ -180,15 +209,15 @@ function getIndicatorOptions() {
         loadPanel: true,
         showColumnLines: false,
         columns: [
-            { dataField: 'isPlotted', allowFiltering: false, width: 30, allowEditing: true },
+            { dataField: 'isPlotted', dataType: 'boolean', allowFiltering: false, width: 30, allowEditing: true, showEditorAlways: true },
             { dataField: 'displayName', allowEditing: false }
         ],
         scrolling: {
-            mode: 'virtual'
+            mode: 'standard'
         },
         editing: {
             editEnabled: true,
-            editMode: 'cell'
+            editMode: 'batch'
         },
         selection: {
             mode: 'single'
@@ -208,6 +237,8 @@ function getIndicatorOptions() {
         hoverStateEnabled: true,
         onSelectionChanged: function (selecteditems) {
             var data = selecteditems.selectedRowsData[0];
+        },
+        onRowUpdated: function(args) {
         }
     }
 }
