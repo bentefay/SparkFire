@@ -306,9 +306,9 @@ function getChartOptions(dataType) {
                 lowValueField: 'low',
                 closeValueField: 'close',
                 argumentField: 'date',
-                color: 'black',
+                color: '#5F8B95',
                 reduction: {
-                    color: 'black'
+                    color: '#5F8B95'
                 }
             }
         ];
@@ -403,8 +403,11 @@ function getChartOptions(dataType) {
             enabled: true,
             location: "edge",
             customizeText: customizeTooltipText,
-            shadow: { opacity: 0.1 },
-            arrowLength: 30
+            shadow: { opacity: 0 },
+            opacity: 0.8,
+            paddingLeftRight: 9,
+            paddingTopBottom: 8,
+            arrowLength: 10
         },
         legend: {
             visible: false
