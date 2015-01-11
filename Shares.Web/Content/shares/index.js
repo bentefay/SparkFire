@@ -1,9 +1,5 @@
-﻿
-var model;
 
-var chartInstances = [];
-var instrumentCodesInstance;
-var indicatorsInstance;
+var model;
 var xAxisSyncer;
 
 $(document).ready(initialisePage);
@@ -60,24 +56,25 @@ function initialiseView() {
 
     model.selectedInstrumentCode = ko.observable();
 
-    ko.computed(function () {
-        var params = constructInstrumentCodeRequestParams();
-        showInstrument(params);
-    }).extend({ rateLimit: 2000 });
+    model.instrumentCodeRequestParams = ko.computed(function () {
+        return constructInstrumentCodeRequestParams();
+    });
 
     ko.applyBindings(model);
 
-    chartInstances.push($("#price").dxChart("instance"));
-    chartInstances.push($("#volume").dxChart("instance"));
-    chartInstances.push($("#range").dxRangeSelector("instance"));
+    for (var i = 0; i < model.chartOptionsCollection().length; i++) {
+        model.chartOptionsCollection()[i].instance = $("#" + model.chartOptionsCollection()[i].id).dxChart("instance");
+    }
 
-    instrumentCodesInstance = $("#instrumentCodes").dxDataGrid("instance");
-    indicatorsInstance = $("#indicators").dxDataGrid("instance");
+    model.rangeSelectorInstance = $("#range").dxRangeSelector("instance");
+    model.instrumentCodesInstance = $("#instrumentCodes").dxDataGrid("instance");
+    model.indicatorsInstance = $("#indicators").dxDataGrid("instance");
 
     showLoading();
 
     xAxisSyncer = new _shares.XAxisSyncer();
-    xAxisSyncer.add(chartInstances);
+    xAxisSyncer.add(_(model.chartOptionsCollection()).map(function(o) { return o.instance }));
+    xAxisSyncer.add([ model.rangeSelectorInstance ]);
 }
 
 function updateChartHeights() {
@@ -119,8 +116,9 @@ function showInstrument(params) {
 }
 
 function showLoading() {
-    for (var i = 0; i < chartInstances.length; i++) {
-        chartInstances[i].showLoadingIndicator();
+    var c = model.chartOptionsCollection();
+    for (var i = 0; i < c.length; i++) {
+        c[i].instance.showLoadingIndicator();
     }
 }
 
@@ -153,7 +151,16 @@ function onGetInstrumentCodes(data) {
 
     model.instrumentCodesDataSource({ store: { data: data, type: 'array', key: 'instrumentCode' } });
 
-    instrumentCodesInstance.selectRows(["NAB"], false);
+    model.instrumentCodesInstance.selectRows(["NAB"], false);
+
+    // Immediately show the instrument and then introduce a delay for further changes
+    model.selectedInstrumentCode("NAB");
+    showInstrument(model.instrumentCodeRequestParams());
+
+    model.instrumentCodeRequestParams.extend({ rateLimit: 2000 })
+    .subscribe(function(params) {
+        showInstrument(params);
+    });
 
 }
 
@@ -196,48 +203,59 @@ function onGetIndicators(data) {
         onUpdated: function(key) {
             arrayStore.byKey(key).done(function (dataItem) {
 
-                var params = constructInstrumentCodeRequestParams();
+                var params = model.instrumentCodeRequestParams();
                 params = _(params).extend(dataItem.defaultParameterObject);
 
-                $.ajax({
-                    dataType: "json",
-                    url: "../../api/indicator/" + dataItem.name,
-                    data: params,
-                    success: function(data) {
+                if (dataItem.isPlotted) {
+                    $.ajax({
+                        dataType: "json",
+                        url: "../../api/indicator/" + dataItem.name,
+                        data: params,
+                        success: function(data) {
 
-                        model.indicatorData[key] = ko.observableArray(data);
-                        model.chartOptionsCollection.splice(1,0, { options: getChartOptions(key), id: key, heightOption: { height: ko.observable("0%"), ratio: 1 } });
-                        var instance = $("#" + key).dxChart("instance");
-                        xAxisSyncer.add([instance]);
-                        chartInstances.push(instance);
+                            model.indicatorData[key] = ko.observableArray(data);
+                            var options = { options: getChartOptions(key), id: key, heightOption: { height: ko.observable("0%"), ratio: 1 } };
+                            model.chartOptionsCollection.splice(1, 0, options);
+                            var instance = $("#" + key).dxChart("instance");
+                            xAxisSyncer.add([instance]);
+                            options.instance = instance;
 
-                        updateChartHeights();
+                            updateChartHeights();
 
-                        var drawn = false;
-                
-                        var onDrawn = function() {
+                            var drawn = false;
 
-                            if (drawn) return;
-                            
-                            instance.off('drawn', onDrawn);
-                            drawn = true;
+                            var onDrawn = function() {
 
-                            setTimeout(function() {
-                                for (var i = 0; i < chartInstances.length; i++) {
-                                    chartInstances[i].render({
-                                        force: true,
-                                        animate: false,
-                                        asyncSeriesRendering: true
-                                    });
-                                }
-                            }, 200);
+                                if (drawn) return;
 
-                            
-                        };
+                                instance.off('drawn', onDrawn);
+                                drawn = true;
+
+                                setTimeout(function() {
+                                    for (var i = 0; i < model.chartOptionsCollection().length; i++) {
+                                        model.chartOptionsCollection()[i].instance.render({
+                                            force: true,
+                                            animate: false,
+                                            asyncSeriesRendering: true
+                                        });
+                                    }
+                                }, 200);
+
+                            };
+
+                            instance.on('drawn', onDrawn);
+                        }
+                    });
+
+                } else {
+
+                    /*var removedOptions = model.chartOptionsCollection.remove(function(item) { return item.id === key });
+                    delete model.indicatorData[key];
                     
-                        instance.on('drawn', onDrawn);
-                    }
-                });
+                    xAxisSyncer.add([instance]);
+                    chartInstances.push(instance);*/
+
+                }
             });
         }
     });
