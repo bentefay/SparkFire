@@ -35,18 +35,7 @@
     height: 10%;
 }
 
-#price {
-    height: 54%;
-    margin-bottom: 1%;
-}
-
-#volume {
-    height: 24%;
-    margin-bottom: 1%;
-}
-
-#ATR {
-    height: 20%;
+.chart {
     margin-bottom: 1%;
 }
 

@@ -15,23 +15,43 @@ namespace Shares.Model.Test.Indicators
     public class AverageTrueRangeIndicatorTests
     {
         [TestMethod]
-        public void TestAll()
+        public void TestNoPadding()
+        {
+            TestAll(checkPadding: false);
+        }
+
+        [TestMethod]
+        public void TestPadding()
+        {
+            TestAll(checkPadding: true);
+        }
+
+        private static void TestAll(bool checkPadding)
         {
             using (var csvReader = new CsvReader(new StreamReader("Indicators/AverageTrueRangeIndicatorTests-All.csv")))
             {
-                var actualRecords = csvReader.GetRecords<AtrDay>().ToList();
-                var shareDays = actualRecords
+                var expectedRecords = csvReader.GetRecords<AtrDay>().ToList();
+
+                if (checkPadding)
+                {
+                    var firstNonNullAtr = expectedRecords.First(r => r.Atr != null).Atr;
+                    foreach (var r in expectedRecords.Where(r => r.Atr == null))
+                        r.Atr = firstNonNullAtr;
+                }
+
+                var shareDays = expectedRecords
                     .Select(r => new ShareDay {Date = r.Date, High = r.High, Low = r.Low, Close = r.Close})
                     .ToArray();
 
                 var parameters = new AverageTrueRangeIndicatorParameters();
-                var actualAtrCollection = new AverageTrueRangeIndicator().Calculate(shareDays, 0, parameters).ToList();
-                
-                var expectedAtrCollection = actualRecords.Where(r => r.Atr != null).Select(r => Point.With(r.Date, r.Atr.Value)).ToList();
+                var actualAtrCollection =
+                    new AverageTrueRangeIndicator().Calculate(shareDays, parameters, 0, pad: checkPadding).ToList();
+
+                var expectedAtrCollection =
+                    expectedRecords.Where(r => r.Atr != null).Select(r => Point.With(r.Date, r.Atr.Value)).ToList();
 
                 CollectionAssert.AreEqual(expectedAtrCollection, actualAtrCollection, new PointComparer(8));
             }
-
         }
 
         public class PointComparer : IComparer

@@ -47,11 +47,11 @@ namespace Shares.Web.Controllers
         }
 
         [Route("api/indicator/averageTrueRange")]
-        public IEnumerable<Point<Decimal>> GetAverageTrueRangeIndicator([FromUri] ShareDataRequest request, [FromUri] AverageTrueRangeIndicatorParameters parameters)
+        public List<Point<Decimal>> GetAverageTrueRangeIndicator([FromUri] ShareDataRequest request, [FromUri] AverageTrueRangeIndicatorParameters parameters)
         {
             var share = GetShareData(request);
 
-            return new AverageTrueRangeIndicator().Calculate(share.Days, 0, parameters);
+            return new AverageTrueRangeIndicator().Calculate(share.Days, parameters, 0, pad: true).ToList();
         }
 
         [Route("api/instrumentCodes")]

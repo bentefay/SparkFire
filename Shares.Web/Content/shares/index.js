@@ -41,9 +41,11 @@ function initialiseView() {
     model.useAggregation = { text: 'Use aggregation?' };
 
     model.chartOptionsCollection = ko.observableArray([
-        { options: getChartOptions('price'), id: 'price' },
-        { options: getChartOptions('volume'), id: 'volume' }
+        { options: getChartOptions('price'), id: 'price', height: '54%' },
+        { options: getChartOptions('volume'), id: 'volume', height: '24%' }
     ]);
+
+
 
     model.rangeOptions = getRangeOptions();
     model.instrumentCodeOptions = getInstrumentCodeOptions();
@@ -194,7 +196,7 @@ function onGetIndicators(data) {
                     success: function(data) {
 
                         model.indicatorData[key] = ko.observableArray(data);
-                        model.chartOptionsCollection.push({ options: getChartOptions(key), id: key });
+                        model.chartOptionsCollection.push({ options: getChartOptions(key), id: key, height: '19%' });
                         var instance = $("#" + key).dxChart("instance");
                         xAxisSyncer.add([instance]);
 
@@ -327,8 +329,7 @@ function getChartOptions(dataType) {
             {
                 type: 'bar',
                 valueField: 'volume',
-                argumentField:
-                    'date'
+                argumentField: 'date'
             }
         ];
 
@@ -343,10 +344,10 @@ function getChartOptions(dataType) {
 
         series = [
             {
-                type: 'bar',
+                type: 'line',
                 valueField: 'value',
-                argumentField:
-                    'dateTime'
+                argumentField: 'dateTime',
+                point: { visible: false }
             }
         ];
 
