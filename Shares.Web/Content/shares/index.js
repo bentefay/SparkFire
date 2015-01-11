@@ -157,7 +157,7 @@ function onGetInstrumentCodes(data) {
     model.selectedInstrumentCode("NAB");
     showInstrument(model.instrumentCodeRequestParams());
 
-    model.instrumentCodeRequestParams.extend({ rateLimit: 2000 })
+    model.instrumentCodeRequestParams.extend({ rateLimit: { timeout: 2000, method: "notifyWhenChangesStop" } })
     .subscribe(function(params) {
         showInstrument(params);
     });
