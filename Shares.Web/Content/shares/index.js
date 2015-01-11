@@ -1,4 +1,4 @@
-
+﻿
 var model;
 
 var chartInstances = [];
@@ -422,6 +422,7 @@ function getChartOptions(dataType) {
         },
         argumentAxis: {
             valueMarginsEnabled: false,
+            placeHolderSize: 0,
             grid: {
                 visible: true
             },
@@ -448,6 +449,9 @@ function getChartOptions(dataType) {
         },
         legend: {
             visible: false
+        },
+        margin: {
+            right: 10
         },
         useAggregation: false,
         commonSeriesSettings: {
