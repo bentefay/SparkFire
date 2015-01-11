@@ -1,4 +1,4 @@
-﻿if (typeof _shares == 'undefined') {
+if (typeof _shares == 'undefined') {
     _shares = {};
 }
 
@@ -67,10 +67,12 @@ _shares.XAxisSyncer = (function () {
         var self = this;
 
         var instanceDescriptorsToRemove = _(self._instanceDescriptors)
-            .where(function (instanceDescriptor) { _(instances).contains(instanceDescriptor.instance) });
+            .filter(function (instanceDescriptor) {
+                return _(instances).contains(instanceDescriptor.instance)
+            });
 
         for (var i = 0; i < instanceDescriptorsToRemove.length; i++) {
-            instanceDescriptor.remove();
+            instanceDescriptorsToRemove[i].remove();
         }
 
         self._instanceDescriptors = _(self._instanceDescriptors).difference(instanceDescriptorsToRemove);

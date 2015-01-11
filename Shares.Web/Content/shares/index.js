@@ -249,11 +249,22 @@ function onGetIndicators(data) {
 
                 } else {
 
-                    /*var removedOptions = model.chartOptionsCollection.remove(function(item) { return item.id === key });
+                    var removedOptions = model.chartOptionsCollection.remove(function(item) { return item.id === key });
                     delete model.indicatorData[key];
                     
-                    xAxisSyncer.add([instance]);
-                    chartInstances.push(instance);*/
+                    xAxisSyncer.remove([removedOptions[0].instance]);
+
+                    updateChartHeights();
+
+                    setTimeout(function() {
+                            for (var i = 0; i < model.chartOptionsCollection().length; i++) {
+                                model.chartOptionsCollection()[i].instance.render({
+                                    force: true,
+                                    animate: false,
+                                    asyncSeriesRendering: true
+                                });
+                            }
+                        }, 200);
 
                 }
             });
