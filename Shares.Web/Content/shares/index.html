@@ -39,7 +39,7 @@
             <section class="right-side">
                 <div id="instrumentCode" data-bind="text: instrumentCodeTitle"></div>
                 <div class="charts" data-bind="foreach: chartOptionsCollection">
-                    <div data-bind="dxChart: options, attr: { id: id }, style: { height: height }" class="chart"></div>
+                    <div data-bind="dxChart: options, attr: { id: id }, style: { height: heightOption.height }" class="chart"></div>
                 </div>
                 <div id="range" data-bind="dxRangeSelector: rangeOptions"></div>
             </section>

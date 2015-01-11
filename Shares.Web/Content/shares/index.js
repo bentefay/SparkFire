@@ -1,4 +1,4 @@
-﻿
+
 var model;
 
 var chartInstances = [];
@@ -41,11 +41,11 @@ function initialiseView() {
     model.useAggregation = { text: 'Use aggregation?' };
 
     model.chartOptionsCollection = ko.observableArray([
-        { options: getChartOptions('price'), id: 'price', height: '54%' },
-        { options: getChartOptions('volume'), id: 'volume', height: '24%' }
+        { options: getChartOptions('price'), id: 'price', heightOption: { height: ko.observable(), ratio: 2 } },
+        { options: getChartOptions('volume'), id: 'volume', heightOption: { height: ko.observable(), ratio: 1 } }
     ]);
 
-
+    updateChartHeights();
 
     model.rangeOptions = getRangeOptions();
     model.instrumentCodeOptions = getInstrumentCodeOptions();
@@ -78,6 +78,16 @@ function initialiseView() {
 
     xAxisSyncer = new _shares.XAxisSyncer();
     xAxisSyncer.add(chartInstances);
+}
+
+function updateChartHeights() {
+    options = _(model.chartOptionsCollection()).map(function (o) { return o.heightOption; });
+    var summedRatios = _(options).map(function (o) { return o.ratio; }).reduce(function (acc, i) { return acc + i; }, 0);
+    var percentagePerRatio = 100 / summedRatios;
+    for (var i = 0; i < options.length; i++) {
+        var percentage = percentagePerRatio * options[i].ratio;
+        options[i].height(percentage + "%");
+    }
 }
 
 function constructInstrumentCodeRequestParams() {
@@ -196,10 +206,36 @@ function onGetIndicators(data) {
                     success: function(data) {
 
                         model.indicatorData[key] = ko.observableArray(data);
-                        model.chartOptionsCollection.push({ options: getChartOptions(key), id: key, height: '19%' });
+                        model.chartOptionsCollection.splice(1,0, { options: getChartOptions(key), id: key, heightOption: { height: ko.observable("0%"), ratio: 1 } });
                         var instance = $("#" + key).dxChart("instance");
                         xAxisSyncer.add([instance]);
+                        chartInstances.push(instance);
 
+                        updateChartHeights();
+
+                        var drawn = false;
+                
+                        var onDrawn = function() {
+
+                            if (drawn) return;
+                            
+                            instance.off('drawn', onDrawn);
+                            drawn = true;
+
+                            setTimeout(function() {
+                                for (var i = 0; i < chartInstances.length; i++) {
+                                    chartInstances[i].render({
+                                        force: true,
+                                        animate: false,
+                                        asyncSeriesRendering: true
+                                    });
+                                }
+                            }, 200);
+
+                            
+                        };
+                    
+                        instance.on('drawn', onDrawn);
                     }
                 });
             });
