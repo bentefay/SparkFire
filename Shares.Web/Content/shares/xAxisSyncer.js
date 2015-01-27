@@ -1,10 +1,6 @@
-if (typeof _shares == 'undefined') {
-    _shares = {};
-}
+define(function() {
 
-_shares.XAxisSyncer = (function () {
-
-    var constructor = function () {
+    var constructor = function() {
         var self = this;
 
         self._instanceDescriptors = [];
@@ -12,7 +8,7 @@ _shares.XAxisSyncer = (function () {
         self._timerId = null;
     };
 
-    constructor.prototype.add = function (instances) {
+    constructor.prototype.add = function(instances) {
         var self = this;
 
         for (var i = 0; i < instances.length; i++) {
@@ -22,36 +18,36 @@ _shares.XAxisSyncer = (function () {
 
             if (instance.zoomArgument) {
                 // dxChart
-                instance.on('drawn', function (args) {
+                instance.on('drawn', function(args) {
                     var ranges = args.component.businessRanges[0].arg;
                     if (ranges.minVisible && ranges.maxVisible) {
                         self._updateZoom({ startValue: ranges.minVisible, endValue: ranges.maxVisible }, args.component);
                     }
                 });
 
-                instanceDescriptor.setBounds = function (newBounds) {
+                instanceDescriptor.setBounds = function(newBounds) {
                     bounds = this.instance.businessRanges[0].arg;
                     if (!boundsEqual(newBounds, bounds.minVisible, bounds.maxVisible))
                         this.instance.zoomArgument(new Date(newBounds.startValue), new Date(newBounds.endValue));
                 };
 
-                instanceDescriptor.remove = function () {
+                instanceDescriptor.remove = function() {
                     this.instance.off('drawn');
                 }
 
             } else if (instance.setSelectedRange) {
                 // dxRangeSelector
-                instance.on('selectedRangeChanged', function (args) {
+                instance.on('selectedRangeChanged', function(args) {
                     self._updateZoom(args, args.component);
                 });
 
-                instanceDescriptor.setBounds = function (newBounds) {
+                instanceDescriptor.setBounds = function(newBounds) {
                     bounds = this.instance.getSelectedRange();
                     if (!boundsEqual(newBounds, bounds.startValue, bounds.endValue))
                         this.instance.setSelectedRange(newBounds);
                 }
 
-                instanceDescriptor.remove = function () {
+                instanceDescriptor.remove = function() {
                     this.instance.off('selectedRangeChanged');
                 }
             } else {
@@ -63,11 +59,11 @@ _shares.XAxisSyncer = (function () {
         }
     };
 
-    constructor.prototype.remove = function (instances) {
+    constructor.prototype.remove = function(instances) {
         var self = this;
 
         var instanceDescriptorsToRemove = _(self._instanceDescriptors)
-            .filter(function (instanceDescriptor) {
+            .filter(function(instanceDescriptor) {
                 return _(instances).contains(instanceDescriptor.instance)
             });
 
@@ -90,7 +86,7 @@ _shares.XAxisSyncer = (function () {
         if (self._timerId !== null)
             clearTimeout(self._timerId);
 
-        self._timerId = setTimeout(function () {
+        self._timerId = setTimeout(function() {
             self._leader = null;
             self._timerId = null;
         }, 500);
@@ -115,4 +111,5 @@ _shares.XAxisSyncer = (function () {
     }
 
     return constructor;
-})();
+
+});

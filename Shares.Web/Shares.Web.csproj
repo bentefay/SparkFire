@@ -1086,7 +1086,11 @@
     <Content Include="Content\shares\kendo\styles\Uniform\sprite_kpi.png" />
     <Content Include="Content\shares\kendo\styles\Uniform\sprite_kpi_2x.png" />
     <Content Include="Content\shares\js\underscore-min.js" />
-    <Content Include="Content\shares\x-axis-syncer.js" />
+    <Content Include="Content\shares\config.js" />
+    <Content Include="Content\shares\require\plugins\text.js" />
+    <Content Include="Content\shares\require\r.js" />
+    <Content Include="Content\shares\require\require.js" />
+    <Content Include="Content\shares\xAxisSyncer.js" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
