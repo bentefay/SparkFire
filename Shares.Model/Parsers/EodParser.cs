@@ -11,7 +11,7 @@ namespace Shares.Model.Parsers
     {
         public Share ParseFile(string filePath)
         {
-            using (var fileStream = new FileStream(filePath, FileMode.Open))
+            using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read))
             using (var r = GetReader(fileStream))
             {
                 return ReadShare(r);

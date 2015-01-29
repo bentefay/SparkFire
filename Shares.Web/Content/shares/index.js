@@ -1,5 +1,5 @@
 
-define(function(require) {
+define(function (require) {
 
     var model;
     var shares = { XAxisSyncer: require('xAxisSyncer') };
@@ -72,17 +72,32 @@ define(function(require) {
         model.rangeSelectorInstance = $("#range").dxRangeSelector("instance");
         model.instrumentCodesInstance = $("#instrumentCodes").dxDataGrid("instance");
         model.indicatorsInstance = $("#indicators").dxDataGrid("instance");
+        model.getDataStrategies = [];
+
+        model.getDataStrategies.push({
+            dataId: "default",
+            getData: function(params) {
+                $.ajax({
+                    dataType: "json",
+                    url: "../../api/instrumentData",
+                    data: params,
+                    success: onGetInstrumentData,
+                    error: (function(jqXhr, textStatus, errorThrown) {
+                    })
+                });
+            }
+        });
 
         showLoading();
 
         xAxisSyncer = new shares.XAxisSyncer();
-        xAxisSyncer.add(_(model.chartOptionsCollection()).map(function(o) { return o.instance }));
+        xAxisSyncer.add(_(model.chartOptionsCollection()).map(function (o) { return o.instance }));
         xAxisSyncer.add([model.rangeSelectorInstance]);
     }
 
     function updateChartHeights() {
-        options = _(model.chartOptionsCollection()).map(function(o) { return o.heightOption; });
-        var summedRatios = _(options).map(function(o) { return o.ratio; }).reduce(function(acc, i) { return acc + i; }, 0);
+        options = _(model.chartOptionsCollection()).map(function (o) { return o.heightOption; });
+        var summedRatios = _(options).map(function (o) { return o.ratio; }).reduce(function (acc, i) { return acc + i; }, 0);
         var percentagePerRatio = 100 / summedRatios;
         for (var i = 0; i < options.length; i++) {
             var percentage = percentagePerRatio * options[i].ratio;
@@ -108,14 +123,9 @@ define(function(require) {
 
         showLoading();
 
-        $.ajax({
-            dataType: "json",
-            url: "../../api/instrumentData",
-            data: params,
-            success: onGetInstrumentData,
-            error: (function(jqXhr, textStatus, errorThrown) {
-            })
-        });
+        for (var i = 0; i < model.getDataStrategies.length; i++) {
+            model.getDataStrategies[i].getData(params);
+        }
     }
 
     function showLoading() {
@@ -161,7 +171,7 @@ define(function(require) {
         showInstrument(model.instrumentCodeRequestParams());
 
         model.instrumentCodeRequestParams.extend({ rateLimit: { timeout: 2000, method: "notifyWhenChangesStop" } })
-            .subscribe(function(params) {
+            .subscribe(function (params) {
                 showInstrument(params);
             });
 
@@ -187,7 +197,7 @@ define(function(require) {
             },
             showColumnHeaders: false,
             hoverStateEnabled: true,
-            onSelectionChanged: function(options) {
+            onSelectionChanged: function (options) {
                 var data = options.selectedRowsData[0];
                 model.selectedInstrumentCode(data.instrumentCode);
             }
@@ -203,63 +213,72 @@ define(function(require) {
         var arrayStore = new DevExpress.data.ArrayStore({
             data: data,
             key: 'displayName',
-            onUpdated: function(key) {
-                arrayStore.byKey(key).done(function(dataItem) {
-
-                    var params = model.instrumentCodeRequestParams();
-                    params = _(params).extend(dataItem.defaultParameterObject);
+            onUpdated: function (key) {
+                arrayStore.byKey(key).done(function (dataItem) {
 
                     if (dataItem.isPlotted) {
-                        $.ajax({
-                            dataType: "json",
-                            url: "../../api/indicator/" + dataItem.name,
-                            data: params,
-                            success: function(data) {
 
-                                model.indicatorData[key] = ko.observableArray(data);
-                                var options = { options: getChartOptions(key), id: key, heightOption: { height: ko.observable("0%"), ratio: 1 } };
-                                model.chartOptionsCollection.splice(1, 0, options);
-                                var instance = $("#" + key).dxChart("instance");
-                                xAxisSyncer.add([instance]);
-                                options.instance = instance;
-
-                                updateChartHeights();
-
-                                var drawn = false;
-
-                                var onDrawn = function() {
-
-                                    if (drawn) return;
-
-                                    instance.off('drawn', onDrawn);
-                                    drawn = true;
-
-                                    setTimeout(function() {
-                                        for (var i = 0; i < model.chartOptionsCollection().length; i++) {
-                                            model.chartOptionsCollection()[i].instance.render({
-                                                force: true,
-                                                animate: false,
-                                                asyncSeriesRendering: true
-                                            });
-                                        }
-                                    }, 200);
-
-                                };
-
-                                instance.on('drawn', onDrawn);
-                            }
-                        });
-
-                    } else {
-
-                        var removedOptions = model.chartOptionsCollection.remove(function(item) { return item.id === key });
-                        delete model.indicatorData[key];
-
-                        xAxisSyncer.remove([removedOptions[0].instance]);
+                        model.indicatorData[key] = ko.observableArray();
+                        var options = { options: getChartOptions(key), id: key, heightOption: { height: ko.observable("0%"), ratio: 1 } };
+                        model.chartOptionsCollection.splice(1, 0, options);
+                        var instance = $("#" + key).dxChart("instance");
+                        xAxisSyncer.add([instance]);
+                        options.instance = instance;
 
                         updateChartHeights();
 
-                        setTimeout(function() {
+                        var drawn = false;
+
+                        var onDrawn = function () {
+
+                            if (drawn) return;
+
+                            instance.off('drawn', onDrawn);
+                            drawn = true;
+
+                            setTimeout(function () {
+                                for (var i = 0; i < model.chartOptionsCollection().length; i++) {
+                                    model.chartOptionsCollection()[i].instance.render({
+                                        force: true,
+                                        animate: false,
+                                        asyncSeriesRendering: true
+                                    });
+                                }
+                            }, 200);
+
+                        };
+
+                        instance.on('drawn', onDrawn);
+
+                        var getData = function(params) {
+
+                            params = _(params).extend(dataItem.defaultParameterObject);
+
+                            $.ajax({
+                                dataType: "json",
+                                url: "../../api/indicator/" + dataItem.name,
+                                data: params,
+                                success: function (data) {
+                                    model.indicatorData[key](data);
+                                }
+                            });
+                        }
+
+                        var params = model.instrumentCodeRequestParams();
+                        getData(params);
+                        model.getDataStrategies.push({ dataId: key, getData: getData });
+
+                    } else {
+
+                        var removedOptions = model.chartOptionsCollection.remove(function (item) { return item.id === key; });
+                        delete model.indicatorData[key];
+
+                        xAxisSyncer.remove([removedOptions[0].instance]);
+                        model.getDataStrategies = _(model.getDataStrategies).reject(function(s) { return s.dataId === key; });
+
+                        updateChartHeights();
+
+                        setTimeout(function () {
                             for (var i = 0; i < model.chartOptionsCollection().length; i++) {
                                 model.chartOptionsCollection()[i].instance.render({
                                     force: true,
@@ -312,10 +331,10 @@ define(function(require) {
             },
             showColumnHeaders: false,
             hoverStateEnabled: true,
-            onSelectionChanged: function(selecteditems) {
+            onSelectionChanged: function (selecteditems) {
                 var data = selecteditems.selectedRowsData[0];
             },
-            onRowUpdated: function(args) {
+            onRowUpdated: function (args) {
             }
         }
     }
@@ -333,8 +352,8 @@ define(function(require) {
                 },
             },
             scale: {
-                //minorTickInterval: 'month',
-                //majorTickInterval: 'year',
+                minorTickInterval: 'month',
+                majorTickInterval: 'year',
                 valueType: 'datetime',
                 placeholderHeight: 20,
                 minRange: {
@@ -365,67 +384,67 @@ define(function(require) {
         var dataSource = model.days;
 
         switch (dataType) {
-        case "price":
-            valueAxisPrefix = "$";
+            case "price":
+                valueAxisPrefix = "$";
 
-            series = [
-                {
-                    type: 'candleStick',
-                    openValueField: 'open',
-                    highValueField: 'high',
-                    lowValueField: 'low',
-                    closeValueField: 'close',
-                    argumentField: 'date',
-                    color: '#5F8B95',
-                    reduction: {
-                        color: '#5F8B95'
+                series = [
+                    {
+                        type: 'candleStick',
+                        openValueField: 'open',
+                        highValueField: 'high',
+                        lowValueField: 'low',
+                        closeValueField: 'close',
+                        argumentField: 'date',
+                        color: '#5F8B95',
+                        reduction: {
+                            color: '#5F8B95'
+                        }
                     }
+                ];
+
+                customizeTooltipText = function () {
+                    return "<b>".concat(Globalize.format(this.argument, "dd/MM/yyyy"), "</b><br/>",
+                        "Open: $", this.openValue, "<br/>",
+                        "Close: $" + this.closeValue, "<br/>",
+                        "High: $", this.highValue, "<br/>",
+                        "Low: $", this.lowValue, "<br/>");
                 }
-            ];
+                break;
 
-            customizeTooltipText = function() {
-                return "<b>".concat(Globalize.format(this.argument, "dd/MM/yyyy"), "</b><br/>",
-                    "Open: $", this.openValue, "<br/>",
-                    "Close: $" + this.closeValue, "<br/>",
-                    "High: $", this.highValue, "<br/>",
-                    "Low: $", this.lowValue, "<br/>");
-            }
-            break;
+            case "volume":
+                series = [
+                    {
+                        type: 'bar',
+                        valueField: 'volume',
+                        argumentField: 'date'
+                    }
+                ];
 
-        case "volume":
-            series = [
-                {
-                    type: 'bar',
-                    valueField: 'volume',
-                    argumentField: 'date'
+                customizeTooltipText = function () {
+                    return "<b>".concat(Globalize.format(this.argument, "dd/MM/yyyy"), "</b><br/>", "Volume: ", this.value);
                 }
-            ];
+                break;
 
-            customizeTooltipText = function() {
-                return "<b>".concat(Globalize.format(this.argument, "dd/MM/yyyy"), "</b><br/>", "Volume: ", this.value);
-            }
-            break;
+            case "ATR":
 
-        case "ATR":
+                dataSource = model.indicatorData["ATR"];
 
-            dataSource = model.indicatorData["ATR"];
+                series = [
+                    {
+                        type: 'line',
+                        valueField: 'value',
+                        argumentField: 'dateTime',
+                        point: { visible: false }
+                    }
+                ];
 
-            series = [
-                {
-                    type: 'line',
-                    valueField: 'value',
-                    argumentField: 'dateTime',
-                    point: { visible: false }
+                customizeTooltipText = function () {
+                    return "<b>".concat(Globalize.format(this.argument, "dd/MM/yyyy"), "</b><br/>", "ATR: ", this.value);
                 }
-            ];
+                break;
 
-            customizeTooltipText = function() {
-                return "<b>".concat(Globalize.format(this.argument, "dd/MM/yyyy"), "</b><br/>", "ATR: ", this.value);
-            }
-            break;
-
-        default:
-            break;
+            default:
+                throw new Error("Unexpected dataType: " + dataType);
         }
 
         return {
@@ -434,7 +453,7 @@ define(function(require) {
                 valueType: 'numeric',
                 placeholderSize: 40,
                 label: {
-                    customizeText: function() {
+                    customizeText: function () {
                         if (this.value >= 1000000000) {
                             return valueAxisPrefix.concat(this.value / 1000000000, "B");
                         } else if (this.value >= 1000000) {
