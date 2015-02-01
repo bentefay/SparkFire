@@ -43,9 +43,9 @@ namespace Shares.Model.Indicators
             if (startIndex >= days.Length)
                 yield break;
 
-            yield return Point.With(days[startIndex].Date, days[startIndex].High - days[startIndex].Low);
-
             var previous = days[startIndex];
+
+            yield return Point.With(previous.Date, previous.High - previous.Low);
 
             for (int i = startIndex + 1; i < days.Length; i++)
             {
