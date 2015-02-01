@@ -1,30 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace Shares.Model.Indicators
 {
-    public class AverageTrueRangeIndicatorParameters
-    {
-        public AverageTrueRangeIndicatorParameters()
-        {
-            NSmoothingPeriods = 14;
-        }
-
-        [Description("The number of periods to include in the rolling average.")]
-        [DisplayName("n smoothing periods")]
-        public int NSmoothingPeriods { get; set; }
-    }
-
     public class AverageTrueRangeIndicator
     {
         public IEnumerable<Point<decimal>> Calculate(ShareDay[] days, AverageTrueRangeIndicatorParameters p, int startIndex, bool pad)
         {
-            if (startIndex + p.NSmoothingPeriods > days.Length)
+            if (startIndex < 0 || startIndex + p.NSmoothingPeriods > days.Length)
                 yield break;
 
-            var trueRanges = GetTrueRanges(days, startIndex).ToList();
+            var trueRanges = new TrueRangeIndicator().Calculate(days, startIndex).ToList();
 
             var averageTrueRange = trueRanges.Take(p.NSmoothingPeriods).Average(t => t.Value);
 
@@ -35,32 +21,6 @@ namespace Shares.Model.Indicators
             {
                 averageTrueRange = (averageTrueRange * (p.NSmoothingPeriods - 1) + trueRange.Value) / p.NSmoothingPeriods;
                 yield return Point.With(trueRange.DateTime, averageTrueRange);
-            }
-        }
-
-        public IEnumerable<Point<decimal>> GetTrueRanges(ShareDay[] days, int startIndex)
-        {
-            if (startIndex >= days.Length)
-                yield break;
-
-            var previous = days[startIndex];
-
-            yield return Point.With(previous.Date, previous.High - previous.Low);
-
-            for (int i = startIndex + 1; i < days.Length; i++)
-            {
-                var current = days[i];
-
-                var trueRange = new[]
-                {
-                    current.High - current.Low, 
-                    Math.Abs(current.High - previous.Close), 
-                    Math.Abs(current.Low - previous.Close)
-                }.Max();
-
-                yield return Point.With(current.Date, trueRange);
-
-                previous = current;
             }
         }
     }

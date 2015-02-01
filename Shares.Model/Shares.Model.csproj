@@ -51,9 +51,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Indicators\AverageTrueRangeIndicator.cs" />
+    <Compile Include="Indicators\AverageTrueRangeIndicatorParameters.cs" />
+    <Compile Include="Indicators\ExponentialMovingAverageIndicator.cs" />
+    <Compile Include="Indicators\ExponentialMovingAverageIndicatorParameters.cs" />
     <Compile Include="Indicators\Metadata\IndicatorInfo.cs" />
     <Compile Include="Indicators\Metadata\IndicatorParameterInfo.cs" />
     <Compile Include="Indicators\Metadata\IndicatorInfoAggregator.cs" />
+    <Compile Include="Indicators\SimpleMovingAverageIndicator.cs" />
+    <Compile Include="Indicators\SimpleMovingAverageIndicatorParameters.cs" />
+    <Compile Include="Indicators\TrueRangeIndicator.cs" />
     <Compile Include="Parsers\CsvParser.cs" />
     <Compile Include="Parsers\EodParser.cs" />
     <Compile Include="Parsers\PrototypeEodParser.cs" />

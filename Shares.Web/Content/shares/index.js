@@ -96,7 +96,7 @@ define(function (require) {
     }
 
     function updateChartHeights() {
-        options = _(model.chartOptionsCollection()).map(function (o) { return o.heightOption; });
+        var options = _(model.chartOptionsCollection()).map(function (o) { return o.heightOption; });
         var summedRatios = _(options).map(function (o) { return o.ratio; }).reduce(function (acc, i) { return acc + i; }, 0);
         var percentagePerRatio = 100 / summedRatios;
         for (var i = 0; i < options.length; i++) {

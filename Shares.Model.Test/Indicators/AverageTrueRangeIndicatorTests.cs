@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -51,28 +50,6 @@ namespace Shares.Model.Test.Indicators
                     expectedRecords.Where(r => r.Atr != null).Select(r => Point.With(r.Date, r.Atr.Value)).ToList();
 
                 CollectionAssert.AreEqual(expectedAtrCollection, actualAtrCollection, new PointComparer(8));
-            }
-        }
-
-        public class PointComparer : IComparer
-        {
-            private readonly int _multiplier;
-
-            public PointComparer(int decimalAccuracy)
-            {
-                _multiplier = (int)Math.Pow(10, decimalAccuracy);
-            }
-
-            public bool Equal(Point<decimal> x, Point<decimal> y)
-            {
-                if (!x.DateTime.Equals(y.DateTime)) return false;
-
-                return (int)(x.Value * _multiplier) == (int)(y.Value * _multiplier);
-            }
-
-            public int Compare(object x, object y)
-            {
-                return Equal((Point<decimal>)x, (Point<decimal>)y) ? 0 : -1;
             }
         }
 
