@@ -42,9 +42,9 @@ namespace Shares.Model.Test.Indicators
                     .Select(r => new ShareDay {Date = r.Date, High = r.High, Low = r.Low, Close = r.Close})
                     .ToArray();
 
-                var parameters = new AverageTrueRangeIndicatorParameters();
+                var parameters = new AtrParameters();
                 var actualAtrCollection =
-                    new AverageTrueRangeIndicator().Calculate(shareDays, parameters, 0, pad: checkPadding).ToList();
+                    new Atr().Calculate(shareDays, parameters, 0, pad: checkPadding).ToList();
 
                 var expectedAtrCollection =
                     expectedRecords.Where(r => r.Atr != null).Select(r => Point.With(r.Date, r.Atr.Value)).ToList();

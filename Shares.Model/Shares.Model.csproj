@@ -50,16 +50,21 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Indicators\AverageTrueRangeIndicator.cs" />
-    <Compile Include="Indicators\AverageTrueRangeIndicatorParameters.cs" />
-    <Compile Include="Indicators\ExponentialMovingAverageIndicator.cs" />
-    <Compile Include="Indicators\ExponentialMovingAverageIndicatorParameters.cs" />
+    <Compile Include="Indicators\Atr.cs" />
+    <Compile Include="Indicators\AtrParameters.cs" />
+    <Compile Include="Indicators\Ema.cs" />
+    <Compile Include="Indicators\EmaParameters.cs" />
+    <Compile Include="Indicators\MacdSignalLine.cs" />
     <Compile Include="Indicators\Metadata\IndicatorInfo.cs" />
     <Compile Include="Indicators\Metadata\IndicatorParameterInfo.cs" />
     <Compile Include="Indicators\Metadata\IndicatorInfoAggregator.cs" />
-    <Compile Include="Indicators\SimpleMovingAverageIndicator.cs" />
-    <Compile Include="Indicators\SimpleMovingAverageIndicatorParameters.cs" />
-    <Compile Include="Indicators\TrueRangeIndicator.cs" />
+    <Compile Include="Indicators\Macd.cs" />
+    <Compile Include="Indicators\MacdParameters.cs" />
+    <Compile Include="Indicators\MacdSignalLineParameters.cs" />
+    <Compile Include="Indicators\Macdh.cs" />
+    <Compile Include="Indicators\Sma.cs" />
+    <Compile Include="Indicators\SmaParameters.cs" />
+    <Compile Include="Indicators\TrueRange.cs" />
     <Compile Include="Parsers\CsvParser.cs" />
     <Compile Include="Parsers\EodParser.cs" />
     <Compile Include="Parsers\PrototypeEodParser.cs" />

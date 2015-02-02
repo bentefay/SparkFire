@@ -2,9 +2,9 @@ using System.ComponentModel;
 
 namespace Shares.Model.Indicators
 {
-    public class AverageTrueRangeIndicatorParameters
+    public class AtrParameters
     {
-        public AverageTrueRangeIndicatorParameters()
+        public AtrParameters()
         {
             NSmoothingPeriods = 14;
         }

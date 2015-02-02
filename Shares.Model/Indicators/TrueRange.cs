@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Shares.Model.Indicators
 {
-    public class TrueRangeIndicator
+    public class TrueRange
     {
         public IEnumerable<Point<decimal>> Calculate(ShareDay[] days, int startIndex)
         {

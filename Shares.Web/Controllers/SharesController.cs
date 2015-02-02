@@ -38,7 +38,7 @@ namespace Shares.Web.Controllers
         }
 
         private readonly IndicatorInfoAggregator _indicatorInfoAggregator = new IndicatorInfoAggregator()
-            .AddIndicator<AverageTrueRangeIndicator, AverageTrueRangeIndicatorParameters>("ATR");
+            .AddIndicator<Atr, AtrParameters>("ATR");
 
         [Route("api/indicators")]
         public List<IndicatorInfo> GetAllIndicators()
@@ -47,11 +47,11 @@ namespace Shares.Web.Controllers
         }
 
         [Route("api/indicator/averageTrueRange")]
-        public List<Point<Decimal>> GetAverageTrueRangeIndicator([FromUri] ShareDataRequest request, [FromUri] AverageTrueRangeIndicatorParameters parameters)
+        public List<Point<Decimal>> GetAverageTrueRangeIndicator([FromUri] ShareDataRequest request, [FromUri] AtrParameters parameters)
         {
             var share = GetShareData(request);
 
-            return new AverageTrueRangeIndicator().Calculate(share.Days, parameters, 0, pad: true).ToList();
+            return new Atr().Calculate(share.Days, parameters, 0, pad: true).ToList();
         }
 
         [Route("api/instrumentCodes")]

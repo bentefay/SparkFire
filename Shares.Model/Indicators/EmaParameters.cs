@@ -2,11 +2,11 @@
 
 namespace Shares.Model.Indicators
 {
-    public class SimpleMovingAverageIndicatorParameters
+    public class EmaParameters
     {
-        public SimpleMovingAverageIndicatorParameters()
+        public EmaParameters()
         {
-            Periods = 10;
+            Periods = 5;
         }
 
         [Description("The number of periods to include in the moving average.")]

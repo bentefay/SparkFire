@@ -2,11 +2,11 @@
 
 namespace Shares.Model.Indicators
 {
-    public class ExponentialMovingAverageIndicatorParameters
+    public class SmaParameters
     {
-        public ExponentialMovingAverageIndicatorParameters()
+        public SmaParameters()
         {
-            Periods = 5;
+            Periods = 10;
         }
 
         [Description("The number of periods to include in the moving average.")]

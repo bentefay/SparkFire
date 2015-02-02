@@ -3,14 +3,15 @@ using System.Linq;
 
 namespace Shares.Model.Indicators
 {
-    public class AverageTrueRangeIndicator
+    // Average True Range
+    public class Atr
     {
-        public IEnumerable<Point<decimal>> Calculate(ShareDay[] days, AverageTrueRangeIndicatorParameters p, int startIndex, bool pad)
+        public IEnumerable<Point<decimal>> Calculate(ShareDay[] days, AtrParameters p, int startIndex, bool pad)
         {
             if (startIndex < 0 || startIndex + p.NSmoothingPeriods > days.Length)
                 yield break;
 
-            var trueRanges = new TrueRangeIndicator().Calculate(days, startIndex).ToList();
+            var trueRanges = new TrueRange().Calculate(days, startIndex).ToList();
 
             var averageTrueRange = trueRanges.Take(p.NSmoothingPeriods).Average(t => t.Value);
 
