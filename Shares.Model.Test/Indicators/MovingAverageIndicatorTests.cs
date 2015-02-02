@@ -25,7 +25,7 @@ namespace Shares.Model.Test.Indicators
 
                 var expected = expectedData.Where(r => r.Sma.HasValue).Select(r => Point.With(r.Date, r.Sma.Value)).ToArray();
 
-                CollectionAssert.AreEqual(expected, actual, new PointComparer(1));
+                CollectionAssert.AreEqual(expected, actual, new PointComparer(8));
             }
         }
 
@@ -41,7 +41,7 @@ namespace Shares.Model.Test.Indicators
 
                 var expected = expectedData.Where(r => r.Ema.HasValue).Select(r => Point.With(r.Date, r.Ema.Value)).ToArray();
 
-                CollectionAssert.AreEqual(expected, actual, new PointComparer(1));
+                CollectionAssert.AreEqual(expected, actual, new PointComparer(4));
             }
         }
     }
