@@ -21,11 +21,7 @@ namespace Shares.Model.Indicators
 
         public static IEnumerable<Point<decimal>> Calculate(Point<decimal>[] macd, int signalPeriods)
         {
-            return Ema.Calculate(
-                macd,
-                r => r.DateTime,
-                r => r.Value,
-                signalPeriods);
+            return Ema.Calculate(macd, r => r.DateTime, r => r.Value, signalPeriods);
         }
     }
 }

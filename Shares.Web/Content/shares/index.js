@@ -443,6 +443,41 @@ define(function (require) {
                 }
                 break;
 
+            case "MACD":
+
+                dataSource = model.indicatorData["MACD"];
+
+                series = [
+                    {
+                        type: 'line',
+                        valueField: 'value',
+                        argumentField: 'dateTime',
+                        point: { visible: false }
+                    }
+                ];
+
+                customizeTooltipText = function () {
+                    return "<b>".concat(Globalize.format(this.argument, "dd/MM/yyyy"), "</b><br/>", "MACD: ", this.value);
+                }
+                break;
+
+            case "MACDH":
+
+                dataSource = model.indicatorData["MACDH"];
+
+                series = [
+                    {
+                        type: 'bar',
+                        valueField: 'value',
+                        argumentField: 'dateTime'
+                    }
+                ];
+
+                customizeTooltipText = function () {
+                    return "<b>".concat(Globalize.format(this.argument, "dd/MM/yyyy"), "</b><br/>", "MACDH: ", this.value);
+                }
+                break;
+
             default:
                 throw new Error("Unexpected dataType: " + dataType);
         }

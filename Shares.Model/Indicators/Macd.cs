@@ -14,12 +14,12 @@ namespace Shares.Model.Indicators
 
         public static IEnumerable<Point<decimal>> Calculate(ShareDay[] days, int shortPeriods, int longPeriods)
         {
-            var longSma = Ema.Calculate(days, longPeriods).ToList();
-            var shortSma = Ema.Calculate(days, shortPeriods).Skip(longPeriods - shortPeriods).ToList();
+            var longEma = Ema.Calculate(days, longPeriods).ToList();
+            var shortEma = Ema.Calculate(days, shortPeriods).Skip(longPeriods - shortPeriods).ToList();
 
-            Debug.Assert(longSma.Count == shortSma.Count);
+            Debug.Assert(longEma.Count == shortEma.Count);
 
-            return shortSma.Select((t, i) => Point.With(t.DateTime, t.Value - longSma[i].Value));
+            return shortEma.Select((t, i) => Point.With(t.DateTime, t.Value - longEma[i].Value));
         }
     }
 }
