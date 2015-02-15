@@ -3,6 +3,7 @@ define(function (require) {
 
     var model;
     var shares = { XAxisSyncer: require('xAxisSyncer') };
+    var chartOptions = require('chartOptions');
     var xAxisSyncer;
 
     $(document).ready(initialisePage);
@@ -40,8 +41,8 @@ define(function (require) {
         model.useAggregation = { text: 'Use aggregation?' };
 
         model.chartOptionsCollection = ko.observableArray([
-            { options: getChartOptions('price'), id: 'price', heightOption: { height: ko.observable(), ratio: 2 } },
-            { options: getChartOptions('volume'), id: 'volume', heightOption: { height: ko.observable(), ratio: 1 } }
+            { options: chartOptions.get('price', model.days), id: 'price', heightOption: { height: ko.observable(), ratio: 2 } },
+            { options: chartOptions.get('volume', model.days), id: 'volume', heightOption: { height: ko.observable(), ratio: 1 } }
         ]);
 
         updateChartHeights();
@@ -218,38 +219,6 @@ define(function (require) {
 
                     if (dataItem.isPlotted) {
 
-                        model.indicatorData[key] = ko.observableArray();
-                        var options = { options: getChartOptions(key), id: key, heightOption: { height: ko.observable("0%"), ratio: 1 } };
-                        model.chartOptionsCollection.splice(1, 0, options);
-                        var instance = $("#" + key).dxChart("instance");
-                        xAxisSyncer.add([instance]);
-                        options.instance = instance;
-
-                        updateChartHeights();
-
-                        var drawn = false;
-
-                        var onDrawn = function () {
-
-                            if (drawn) return;
-
-                            instance.off('drawn', onDrawn);
-                            drawn = true;
-
-                            setTimeout(function () {
-                                for (var i = 0; i < model.chartOptionsCollection().length; i++) {
-                                    model.chartOptionsCollection()[i].instance.render({
-                                        force: true,
-                                        animate: false,
-                                        asyncSeriesRendering: true
-                                    });
-                                }
-                            }, 200);
-
-                        };
-
-                        instance.on('drawn', onDrawn);
-
                         var getData = function(params) {
 
                             params = _(params).extend(dataItem.defaultParameterObject);
@@ -259,7 +228,39 @@ define(function (require) {
                                 url: "../../api/indicator/" + dataItem.name,
                                 data: params,
                                 success: function (data) {
-                                    model.indicatorData[key](data);
+
+                                    model.indicatorData[key] = ko.observableArray(data);
+                                    var options = { options: chartOptions.get(key, model.indicatorData[key]), id: key, heightOption: { height: ko.observable("0%"), ratio: 1 } };
+                                    model.chartOptionsCollection.splice(1, 0, options);
+                                    var instance = $("#" + key).dxChart("instance");
+                                    xAxisSyncer.add([instance]);
+                                    options.instance = instance;
+
+                                    updateChartHeights();
+
+                                    var drawn = false;
+
+                                    var onDrawn = function () {
+
+                                        if (drawn) return;
+
+                                        instance.off('drawn', onDrawn);
+                                        drawn = true;
+
+                                        setTimeout(function () {
+                                            for (var i = 0; i < model.chartOptionsCollection().length; i++) {
+                                                model.chartOptionsCollection()[i].instance.render({
+                                                    force: true,
+                                                    animate: false,
+                                                    asyncSeriesRendering: true
+                                                });
+                                            }
+                                        }, 200);
+
+                                    };
+
+                                    instance.on('drawn', onDrawn);
+
                                 }
                             });
                         }
@@ -374,178 +375,5 @@ define(function (require) {
                 bottom: 0
             }
         }
-    }
-
-    function getChartOptions(dataType) {
-
-        var series;
-        var valueAxisPrefix = "";
-        var customizeTooltipText;
-        var dataSource = model.days;
-
-        switch (dataType) {
-            case "price":
-                valueAxisPrefix = "$";
-
-                series = [
-                    {
-                        type: 'candleStick',
-                        openValueField: 'open',
-                        highValueField: 'high',
-                        lowValueField: 'low',
-                        closeValueField: 'close',
-                        argumentField: 'date',
-                        color: '#5F8B95',
-                        reduction: {
-                            color: '#5F8B95'
-                        }
-                    }
-                ];
-
-                customizeTooltipText = function () {
-                    return "<b>".concat(Globalize.format(this.argument, "dd/MM/yyyy"), "</b><br/>",
-                        "Open: $", this.openValue, "<br/>",
-                        "Close: $" + this.closeValue, "<br/>",
-                        "High: $", this.highValue, "<br/>",
-                        "Low: $", this.lowValue, "<br/>");
-                }
-                break;
-
-            case "volume":
-                series = [
-                    {
-                        type: 'bar',
-                        valueField: 'volume',
-                        argumentField: 'date'
-                    }
-                ];
-
-                customizeTooltipText = function () {
-                    return "<b>".concat(Globalize.format(this.argument, "dd/MM/yyyy"), "</b><br/>", "Volume: ", this.value);
-                }
-                break;
-
-            case "ATR":
-
-                dataSource = model.indicatorData["ATR"];
-
-                series = [
-                    {
-                        type: 'line',
-                        valueField: 'value',
-                        argumentField: 'dateTime',
-                        point: { visible: false }
-                    }
-                ];
-
-                customizeTooltipText = function () {
-                    return "<b>".concat(Globalize.format(this.argument, "dd/MM/yyyy"), "</b><br/>", "ATR: ", this.value);
-                }
-                break;
-
-            case "MACD":
-
-                dataSource = model.indicatorData["MACD"];
-
-                series = [
-                    {
-                        type: 'line',
-                        valueField: 'value',
-                        argumentField: 'dateTime',
-                        point: { visible: false }
-                    }
-                ];
-
-                customizeTooltipText = function () {
-                    return "<b>".concat(Globalize.format(this.argument, "dd/MM/yyyy"), "</b><br/>", "MACD: ", this.value);
-                }
-                break;
-
-            case "MACDH":
-
-                dataSource = model.indicatorData["MACDH"];
-
-                series = [
-                    {
-                        type: 'bar',
-                        valueField: 'value',
-                        argumentField: 'dateTime'
-                    }
-                ];
-
-                customizeTooltipText = function () {
-                    return "<b>".concat(Globalize.format(this.argument, "dd/MM/yyyy"), "</b><br/>", "MACDH: ", this.value);
-                }
-                break;
-
-            default:
-                throw new Error("Unexpected dataType: " + dataType);
-        }
-
-        return {
-            dataSource: dataSource,
-            valueAxis: {
-                valueType: 'numeric',
-                placeholderSize: 40,
-                label: {
-                    customizeText: function () {
-                        if (this.value >= 1000000000) {
-                            return valueAxisPrefix.concat(this.value / 1000000000, "B");
-                        } else if (this.value >= 1000000) {
-                            return valueAxisPrefix.concat(this.value / 1000000, "M");
-                        } else if (this.value >= 1000) {
-                            return valueAxisPrefix.concat(this.value / 1000, "K");
-                        } else {
-                            return valueAxisPrefix.concat(this.value);
-                        }
-                    }
-                }
-            },
-            scrollingMode: 'all',
-            zoomingMode: 'all',
-            scrollBar: {
-                visible: false
-            },
-            argumentAxis: {
-                valueMarginsEnabled: false,
-                placeHolderSize: 0,
-                grid: {
-                    visible: true
-                },
-                label: {
-                    visible: dataType === "volume"
-                },
-                argumentType: 'datetime'
-            },
-            crosshair: {
-                enabled: false,
-                label: {
-                    visible: true
-                }
-            },
-            tooltip: {
-                enabled: true,
-                location: "edge",
-                customizeText: customizeTooltipText,
-                shadow: { opacity: 0 },
-                opacity: 0.8,
-                paddingLeftRight: 9,
-                paddingTopBottom: 8,
-                arrowLength: 10
-            },
-            legend: {
-                visible: false
-            },
-            margin: {
-                right: 10
-            },
-            useAggregation: false,
-            commonSeriesSettings: {
-                ignoreEmptyPoints: true
-            },
-            series: series,
-            animation: { enabled: false },
-            loadingIndicator: { show: true }
-        };
     }
 });
