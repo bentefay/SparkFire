@@ -66,6 +66,8 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Indicators\AverageTrueRangeIndicatorTests.cs" />
+    <Compile Include="Indicators\EnumerableAssert.cs" />
+    <Compile Include="Indicators\MacdhTests.cs" />
     <Compile Include="Indicators\PointComparer.cs" />
     <Compile Include="Indicators\MovingAverageIndicatorTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -77,9 +79,13 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Indicators\AverageTrueRangeIndicatorTests-All.csv">
+    <None Include="Indicators\AverageTrueRangeIndicatorTests.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="Indicators\MacdhTests.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Indicators\MacdhTests.xlsx" />
     <None Include="Indicators\MovingAverageTests.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

@@ -54,6 +54,7 @@
     <Compile Include="Indicators\AtrParameters.cs" />
     <Compile Include="Indicators\Ema.cs" />
     <Compile Include="Indicators\EmaParameters.cs" />
+    <Compile Include="Indicators\MacdhParameters.cs" />
     <Compile Include="Indicators\MacdSignalLine.cs" />
     <Compile Include="Indicators\Metadata\IndicatorInfo.cs" />
     <Compile Include="Indicators\Metadata\IndicatorParameterInfo.cs" />

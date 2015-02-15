@@ -45,6 +45,11 @@ namespace Shares.Model
         {
             return !left.Equals(right);
         }
+
+        public override string ToString()
+        {
+            return String.Format("({0}, {1})", DateTime, Value);
+        }
     }
 
     public static class Point

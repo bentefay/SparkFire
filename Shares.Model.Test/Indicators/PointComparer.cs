@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace Shares.Model.Test.Indicators
 {
-    public class PointComparer : IComparer
+    public class PointComparer : IComparer<Point<Decimal>>, IComparer
     {
         private readonly long _multiplier;
 
@@ -22,6 +23,11 @@ namespace Shares.Model.Test.Indicators
         public int Compare(object x, object y)
         {
             return Equal((Point<decimal>)x, (Point<decimal>)y) ? 0 : -1;
+        }
+
+        public int Compare(Point<decimal> x, Point<decimal> y)
+        {
+            return Equal(x, y) ? 0 : -1;
         }
     }
 }

@@ -6,7 +6,7 @@ namespace Shares.Model.Indicators
     // Moving Average Convergence/Divergence Signal Line
     public class MacdSignalLine
     {
-        public static IEnumerable<Point<decimal>> Calculate(ShareDay[] days,
+        public IEnumerable<Point<decimal>> Calculate(ShareDay[] days,
             MacdSignalLineParameters p)
         {
             return Calculate(days, p.SignalEmaPeriods, p.ShortEmaPeriods, p.LongEmaPeriods);

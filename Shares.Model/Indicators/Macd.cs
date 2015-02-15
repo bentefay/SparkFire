@@ -7,7 +7,7 @@ namespace Shares.Model.Indicators
     // Moving Average Divergence/Convergence
     public class Macd
     {
-        public static IEnumerable<Point<decimal>> Calculate(ShareDay[] days, MacdParameters p)
+        public IEnumerable<Point<decimal>> Calculate(ShareDay[] days, MacdParameters p)
         {
             return Calculate(days, p.ShortEmaPeriods, p.LongEmaPeriods);
         }
