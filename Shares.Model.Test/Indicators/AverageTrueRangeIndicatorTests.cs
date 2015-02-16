@@ -42,7 +42,7 @@ namespace Shares.Model.Test.Indicators
                     .Select(r => new ShareDay {Date = r.Date, High = r.High, Low = r.Low, Close = r.Close})
                     .ToArray();
 
-                var parameters = new AtrParameters();
+                var parameters = new Atr.Parameters();
                 var actualAtrCollection =
                     new Atr().Calculate(shareDays, parameters, 0, pad: checkPadding).ToList();
 

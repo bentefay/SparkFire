@@ -20,7 +20,7 @@ namespace Shares.Model.Test.Indicators
                 var expectedData = csvReader.GetRecords<MacdhDay>().ToList();
 
                 var days = expectedData.Select(r => new ShareDay { Date = r.Date, Close = r.Price }).ToArray();
-                var actual = new Macdh().Calculate(days, new MacdhParameters { LongEmaPeriods = 26, ShortEmaPeriods = 12, SignalEmaPeriods = 9 }).ToArray();
+                var actual = new Macdh().Calculate(days, new Macdh.Parameters { LongEmaPeriods = 26, ShortEmaPeriods = 12, SignalEmaPeriods = 9 }).ToArray();
 
                 var expected = expectedData.Where(r => r.Macdh.HasValue).Select(r => Point.With(r.Date, r.Macdh.Value)).ToArray();
 
@@ -37,7 +37,7 @@ namespace Shares.Model.Test.Indicators
 
                 var days = expectedData.Select(r => new ShareDay { Date = r.Date, Close = r.Price }).ToArray();
                 var actual = new MacdSignalLine().Calculate(days, 
-                    new MacdSignalLineParameters { LongEmaPeriods = 26, ShortEmaPeriods = 12, SignalEmaPeriods = 9 }).ToArray();
+                    new MacdSignalLine.Parameters { LongEmaPeriods = 26, ShortEmaPeriods = 12, SignalEmaPeriods = 9 }).ToArray();
 
                 var expected = expectedData.Where(r => r.Ema9.HasValue).Select(r => Point.With(r.Date, r.Ema9.Value)).ToArray();
 
@@ -54,7 +54,7 @@ namespace Shares.Model.Test.Indicators
 
                 var days = expectedData.Select(r => new ShareDay { Date = r.Date, Close = r.Price }).ToArray();
                 var actual = new Macd().Calculate(days,
-                    new MacdParameters { LongEmaPeriods = 26, ShortEmaPeriods = 12 }).ToArray();
+                    new Macd.Parameters { LongEmaPeriods = 26, ShortEmaPeriods = 12 }).ToArray();
 
                 var expected = expectedData.Where(r => r.Macd.HasValue).Select(r => Point.With(r.Date, r.Macd.Value)).ToArray();
 

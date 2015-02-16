@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 
 namespace Shares.Model.Indicators
@@ -7,7 +8,7 @@ namespace Shares.Model.Indicators
     // Exponential Moving Average
     public class Ema
     {
-        public IEnumerable<Point<decimal>> Calculate(ShareDay[] days, EmaParameters p)
+        public IEnumerable<Point<decimal>> Calculate(ShareDay[] days, Parameters p)
         {
             return Calculate(days, d => d.Date, d => d.Close, p.Periods);
         }
@@ -33,6 +34,18 @@ namespace Shares.Model.Indicators
                 ema = (value(days[i]) - ema) * multiplier + ema;
                 yield return Point.With(date(days[i]), ema);
             }
+        }
+
+        public class Parameters
+        {
+            public Parameters()
+            {
+                Periods = 5;
+            }
+
+            [Description("The number of periods to include in the moving average.")]
+            [DisplayName("Periods")]
+            public int Periods { get; set; }
         }
     }
 }

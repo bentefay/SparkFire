@@ -6,7 +6,7 @@ namespace Shares.Model.Indicators
     // Moving Average Convergence/Divergence Histogram
     public class Macdh
     {
-        public IEnumerable<Point<decimal>> Calculate(ShareDay[] days, MacdhParameters p)
+        public IEnumerable<Point<decimal>> Calculate(ShareDay[] days, Parameters p)
         {
             return Calculate(days, p.SignalEmaPeriods, p.ShortEmaPeriods, p.LongEmaPeriods);
         }
@@ -17,6 +17,10 @@ namespace Shares.Model.Indicators
             var signalLine = MacdSignalLine.Calculate(macd, signalPeriods).ToArray();
             var macdNormalised = macd.Skip(signalPeriods - 1);
             return macdNormalised.Select((r, i) => Point.With(r.DateTime, r.Value - signalLine[i].Value));
+        }
+
+        public class Parameters : MacdSignalLine.Parameters
+        {
         }
     }
 }

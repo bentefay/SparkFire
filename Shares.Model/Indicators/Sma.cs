@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Shares.Model.Indicators
 {
     // Simple Moving Average
     public class Sma
     {
-        public IEnumerable<Point<decimal>> Calculate(ShareDay[] days, SmaParameters p)
+        public IEnumerable<Point<decimal>> Calculate(ShareDay[] days, Parameters p)
         {
             return Calculate(days, d => d.Date, d => d.Close, p.Periods);
         }
@@ -33,6 +32,18 @@ namespace Shares.Model.Indicators
                 total += value(days[i]);
                 yield return Point.With(date(days[i]), total / periods);
             }
+        }
+
+        public class Parameters
+        {
+            public Parameters()
+            {
+                Periods = 10;
+            }
+
+            [Description("The number of periods to include in the moving average.")]
+            [DisplayName("Periods")]
+            public int Periods { get; set; }
         }
     }
 }

@@ -37,10 +37,10 @@ namespace Shares.Web.Controllers
         }
 
         private readonly IndicatorInfoAggregator _indicatorInfoAggregator = new IndicatorInfoAggregator()
-            .AddIndicator<Atr, AtrParameters>("ATR")
-            .AddIndicator<Macd, MacdParameters>("MACD")
-            .AddIndicator<MacdSignalLine, MacdSignalLineParameters>("MACD Signal Line", "MACD")
-            .AddIndicator<Macdh, MacdhParameters>("MACDH");
+            .AddIndicator<Atr, Atr.Parameters>("ATR")
+            .AddIndicator<Macd, Macd.Parameters>("MACD")
+            .AddIndicator<MacdSignalLine, MacdSignalLine.Parameters>("MACD Signal Line", "MACD")
+            .AddIndicator<Macdh, Macdh.Parameters>("MACDH");
 
         [Route("api/indicators")]
         public List<IndicatorInfo> GetAllIndicators()
@@ -49,7 +49,7 @@ namespace Shares.Web.Controllers
         }
 
         [Route("api/indicator/atr")]
-        public List<Point<Decimal>> GetAtrIndicator([FromUri] ShareDataRequest request, [FromUri] AtrParameters parameters)
+        public List<Point<Decimal>> GetAtrIndicator([FromUri] ShareDataRequest request, [FromUri] Atr.Parameters parameters)
         {
             var share = GetShareData(request);
 
@@ -57,7 +57,7 @@ namespace Shares.Web.Controllers
         }
 
         [Route("api/indicator/macd")]
-        public List<Point<Decimal>> GetMacdIndicator([FromUri] ShareDataRequest request, [FromUri] MacdParameters parameters)
+        public List<Point<Decimal>> GetMacdIndicator([FromUri] ShareDataRequest request, [FromUri] Macd.Parameters parameters)
         {
             var share = GetShareData(request);
 
@@ -65,7 +65,7 @@ namespace Shares.Web.Controllers
         }
 
         [Route("api/indicator/macdh")]
-        public List<Point<Decimal>> GetMacdhIndicator([FromUri] ShareDataRequest request, [FromUri] MacdhParameters parameters)
+        public List<Point<Decimal>> GetMacdhIndicator([FromUri] ShareDataRequest request, [FromUri] Macdh.Parameters parameters)
         {
             var share = GetShareData(request);
 

@@ -6,7 +6,7 @@ namespace Shares.Model.Indicators
 {
     public class TrueRange
     {
-        public IEnumerable<Point<decimal>> Calculate(ShareDay[] days, int startIndex)
+        public static IEnumerable<Point<decimal>> Calculate(ShareDay[] days, int startIndex)
         {
             if (startIndex >= days.Length)
                 yield break;

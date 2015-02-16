@@ -21,7 +21,7 @@ namespace Shares.Model.Test.Indicators
                 var expectedData = csvReader.GetRecords<MovingAverageDay>().ToList();
                 
                 var days = expectedData.Select(r => new ShareDay { Date = r.Date, Close = r.Price }).ToArray();
-                var actual = new Sma().Calculate(days, new SmaParameters { Periods = 10 }).ToArray();
+                var actual = new Sma().Calculate(days, new Sma.Parameters { Periods = 10 }).ToArray();
 
                 var expected = expectedData.Where(r => r.Sma.HasValue).Select(r => Point.With(r.Date, r.Sma.Value)).ToArray();
 
@@ -37,7 +37,7 @@ namespace Shares.Model.Test.Indicators
                 var expectedData = csvReader.GetRecords<MovingAverageDay>().ToList();
 
                 var days = expectedData.Select(r => new ShareDay { Date = r.Date, Close = r.Price }).ToArray();
-                var actual = new Ema().Calculate(days, new EmaParameters { Periods = 10 }).ToArray();
+                var actual = new Ema().Calculate(days, new Ema.Parameters { Periods = 10 }).ToArray();
 
                 var expected = expectedData.Where(r => r.Ema.HasValue).Select(r => Point.With(r.Date, r.Ema.Value)).ToArray();
 
