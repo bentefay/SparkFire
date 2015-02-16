@@ -6,6 +6,9 @@ namespace Shares.Model.Indicators
 {
     public class TrueRange
     {
+        /// <summary>
+        /// Returns TR array of length [days.Length]
+        /// </summary>
         public static IEnumerable<Point<decimal>> Calculate(ShareDay[] days, int startIndex)
         {
             if (startIndex >= days.Length)

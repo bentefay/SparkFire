@@ -18,6 +18,9 @@ namespace Shares.Model.Indicators
             return Calculate(days, d => d.Date, d => d.Close, periods);
         }
 
+        /// <summary>
+        /// Returns exponential moving average array of length [days.Length - periods + 1]
+        /// </summary>
         public static IEnumerable<Point<decimal>> Calculate<T>(T[] days, Func<T, DateTime> date, Func<T, decimal> value, int periods)
         {
             if (periods > days.Length)

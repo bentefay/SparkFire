@@ -59,6 +59,7 @@
     <Compile Include="Indicators\Metadata\IndicatorInfoAggregator.cs" />
     <Compile Include="Indicators\Macd.cs" />
     <Compile Include="Indicators\Macdh.cs" />
+    <Compile Include="ReadOnlyListExtensions.cs" />
     <Compile Include="Indicators\Sma.cs" />
     <Compile Include="Indicators\TrueRange.cs" />
     <Compile Include="Parsers\CsvParser.cs" />
