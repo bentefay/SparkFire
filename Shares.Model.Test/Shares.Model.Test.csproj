@@ -79,6 +79,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Indicators\AdxTests.xlsx" />
     <None Include="Indicators\AverageTrueRangeIndicatorTests.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
