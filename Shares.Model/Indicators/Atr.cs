@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 
@@ -9,29 +10,21 @@ namespace Shares.Model.Indicators
     {
         public IEnumerable<Point<decimal>> Calculate(ShareDay[] days, Parameters p, int startIndex, bool pad)
         {
-            return Calculate(days, p.NSmoothingPeriods, startIndex, pad);
+            return Calculate(days, p.NSmoothingPeriods, startIndex, pad, includeFirstTrueRange: true);
         }
 
         /// <summary>
         /// Returns ATR array of length [days.Length - nSmoothingPeriods + 1]
         /// </summary>
-        public static IEnumerable<Point<decimal>> Calculate(ShareDay[] days, int nSmoothingPeriods, int startIndex, bool pad)
+        public static IEnumerable<Point<decimal>> Calculate(ShareDay[] days, int nSmoothingPeriods, int startIndex, bool pad, bool includeFirstTrueRange = true)
         {
             if (startIndex < 0 || startIndex + nSmoothingPeriods > days.Length)
-                yield break;
+                return Enumerable.Empty<Point<Decimal>>();
 
-            var trueRanges = TrueRange.Calculate(days, startIndex).ToList();
+            var trueRanges = TrueRange.Calculate(days, startIndex, includeFirstTrueRange).ToArray();
 
-            var averageTrueRange = trueRanges.Take(nSmoothingPeriods).Average(t => t.Value);
-
-            for (int i = pad ? 0 : nSmoothingPeriods - 1; i < nSmoothingPeriods; i++) 
-                yield return Point.With(days[i].Date, averageTrueRange);
-
-            foreach (var trueRange in trueRanges.Skip(nSmoothingPeriods))
-            {
-                averageTrueRange = (averageTrueRange * (nSmoothingPeriods - 1) + trueRange.Value) / nSmoothingPeriods;
-                yield return Point.With(trueRange.DateTime, averageTrueRange);
-            }
+            return Ema.Calculate(trueRanges, tr => tr.DateTime, tr => tr.Value, nSmoothingPeriods, pad: pad,
+                simpleMultiplier: true);
         }
 
         public class Parameters

@@ -54,14 +54,14 @@ namespace Shares.Model.Indicators
         public static IEnumerable<Point> Calculate(ShareDay[] days, int periods)
         {
             var dmPoints = CalculateDirectionalMovement(days).ToArray();
-            var positiveDmEma = Ema.Calculate(dmPoints, p => p.DateTime, p => p.PositiveDm, periods).ToArray();
-            var negativeDmEma = Ema.Calculate(dmPoints, p => p.DateTime, p => p.NegativeDm, periods).ToArray();
-            var atr = Atr.Calculate(days, periods, 0, false).ToArray();
+            var positiveDmEma = Ema.Calculate(dmPoints, p => p.DateTime, p => p.PositiveDm, periods, simpleMultiplier: true).ToArray();
+            var negativeDmEma = Ema.Calculate(dmPoints, p => p.DateTime, p => p.NegativeDm, periods, simpleMultiplier: true).ToArray();
+            var atr = Atr.Calculate(days, periods, 0, pad: false, includeFirstTrueRange: false).ToArray();
             var positiveDi = positiveDmEma.ZipEnds(atr, (ema, a) => Model.Point.With(ema.DateTime, 100 * ema.Value / a.Value)).ToArray();
             var negativeDi = negativeDmEma.ZipEnds(atr, (ema, a) => Model.Point.With(ema.DateTime, 100 * ema.Value / a.Value)).ToArray();
-            var preAdx = positiveDi.Zip(negativeDi, (p, n) => Model.Point.With(p.DateTime, 
+            var ad = positiveDi.Zip(negativeDi, (p, n) => Model.Point.With(p.DateTime, 
                 100 * Math.Abs(p.Value - n.Value) / Math.Abs(p.Value + n.Value))).ToArray();
-            var adx = Ema.Calculate(preAdx, p => p.DateTime, p => p.Value, periods).ToArray();
+            var adx = Ema.Calculate(ad, p => p.DateTime, p => p.Value, periods).ToArray();
 
             for (int i = 0, j = periods - 1; i < adx.Length; i++, j++)
             {

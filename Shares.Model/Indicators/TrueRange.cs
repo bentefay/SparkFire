@@ -9,14 +9,15 @@ namespace Shares.Model.Indicators
         /// <summary>
         /// Returns TR array of length [days.Length]
         /// </summary>
-        public static IEnumerable<Point<decimal>> Calculate(ShareDay[] days, int startIndex)
+        public static IEnumerable<Point<decimal>> Calculate(ShareDay[] days, int startIndex, bool includeFirstTrueRange)
         {
             if (startIndex >= days.Length)
                 yield break;
 
             var previous = days[startIndex];
 
-            yield return Point.With(previous.Date, previous.High - previous.Low);
+            if (includeFirstTrueRange)
+                yield return Point.With(previous.Date, previous.High - previous.Low);
 
             for (int i = startIndex + 1; i < days.Length; i++)
             {
