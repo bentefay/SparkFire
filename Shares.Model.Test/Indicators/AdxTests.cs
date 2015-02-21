@@ -26,7 +26,9 @@ namespace Shares.Model.Test.Indicators
                 var expected = expectedData.Where(r => r.Adx.HasValue)
                     .Select(r => new Adx.Point { DateTime = r.Date, Adx = r.Adx.Value, PositiveDi = r.PlusDi14.Value, NegativeDi = r.MinusDi14.Value }).ToArray();
 
-                EnumerableAssert.AreEqual(expected, actual, new PointComparer<Adx.Point>(7, a => a.DateTime, a => a.Adx));
+                EnumerableAssert.AreEqual(expected, actual, new PointComparer<Adx.Point>(5, a => a.DateTime, a => a.Adx), printAll: false);
+                EnumerableAssert.AreEqual(expected, actual, new PointComparer<Adx.Point>(5, a => a.DateTime, a => a.PositiveDi), printAll: false);
+                EnumerableAssert.AreEqual(expected, actual, new PointComparer<Adx.Point>(5, a => a.DateTime, a => a.NegativeDi), printAll: false);
             }
         }
 

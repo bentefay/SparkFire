@@ -61,7 +61,7 @@ namespace Shares.Model.Indicators
             var negativeDi = negativeDmEma.ZipEnds(atr, (ema, a) => Model.Point.With(ema.DateTime, 100 * ema.Value / a.Value)).ToArray();
             var ad = positiveDi.Zip(negativeDi, (p, n) => Model.Point.With(p.DateTime, 
                 100 * Math.Abs(p.Value - n.Value) / Math.Abs(p.Value + n.Value))).ToArray();
-            var adx = Ema.Calculate(ad, p => p.DateTime, p => p.Value, periods).ToArray();
+            var adx = Ema.Calculate(ad, p => p.DateTime, p => p.Value, periods, simpleMultiplier: true).ToArray();
 
             for (int i = 0, j = periods - 1; i < adx.Length; i++, j++)
             {
@@ -95,7 +95,7 @@ namespace Shares.Model.Indicators
 
             public override string ToString()
             {
-                return String.Format("(DateTime: {0}, PositiveDm: {1}, NegativeDm: {2})",
+                return String.Format("({0}, +Dm: {1}, -Dm: {2})",
                     DateTime, PositiveDm, NegativeDm);
             }
         }
@@ -109,7 +109,7 @@ namespace Shares.Model.Indicators
 
             public override string ToString()
             {
-                return String.Format("(DateTime: {0}, PositiveDi: {1}, NegativeDi: {2}, Adx: {3})", 
+                return String.Format("({0}, +Di: {1}, -Di: {2}, {3})", 
                     DateTime, PositiveDi, NegativeDi, Adx);
             }
         }
