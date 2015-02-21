@@ -40,7 +40,8 @@ namespace Shares.Web.Controllers
             .AddIndicator<Atr, Atr.Parameters>("ATR")
             .AddIndicator<Macd, Macd.Parameters>("MACD")
             .AddIndicator<MacdSignalLine, MacdSignalLine.Parameters>("MACD Signal Line", "MACD")
-            .AddIndicator<Macdh, Macdh.Parameters>("MACDH");
+            .AddIndicator<Macdh, Macdh.Parameters>("MACDH")
+            .AddIndicator<Adx, Adx.Parameters>("ADX");
 
         [Route("api/indicators")]
         public List<IndicatorInfo> GetAllIndicators()
@@ -70,6 +71,14 @@ namespace Shares.Web.Controllers
             var share = GetShareData(request);
 
             return new Macdh().Calculate(share.Days, parameters).ToList();
+        }
+
+        [Route("api/indicator/adx")]
+        public List<Adx.Point> GetAdxIndicator([FromUri] ShareDataRequest request, [FromUri] Adx.Parameters parameters)
+        {
+            var share = GetShareData(request);
+
+            return new Adx().Calculate(share.Days, parameters).ToList();
         }
 
         private string GetEodFilePath()

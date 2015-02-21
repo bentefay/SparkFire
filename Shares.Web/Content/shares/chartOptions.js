@@ -95,6 +95,34 @@
                 }
                 break;
 
+            case "ADX":
+
+                series = [
+                    {
+                        type: 'line',
+                        valueField: 'adx',
+                        argumentField: 'dateTime',
+                        point: { visible: false }
+                    },
+                    {
+                        type: 'line',
+                        valueField: 'positiveDi',
+                        argumentField: 'dateTime',
+                        point: { visible: false }
+                    },
+                    {
+                        type: 'line',
+                        valueField: 'negativeDi',
+                        argumentField: 'dateTime',
+                        point: { visible: false }
+                    }
+                ];
+
+                customizeTooltipText = function () {
+                    return "<b>".concat(Globalize.format(this.argument, "dd/MM/yyyy"), "</b><br/>", "ADX: ", this.value);
+                }
+                break;
+
             default:
                 throw new Error("Unexpected dataType: " + dataType);
         }
