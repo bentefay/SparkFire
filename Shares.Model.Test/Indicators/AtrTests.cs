@@ -11,7 +11,7 @@ using Shares.Model.Indicators;
 namespace Shares.Model.Test.Indicators
 {
     [TestClass]
-    public class AverageTrueRangeIndicatorTests
+    public class AtrTests
     {
         [TestMethod]
         public void TestNoPadding()

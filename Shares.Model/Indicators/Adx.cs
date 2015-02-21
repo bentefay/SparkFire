@@ -92,14 +92,26 @@ namespace Shares.Model.Indicators
             public DateTime DateTime { get; set; }
             public decimal PositiveDm { get; set; }
             public decimal NegativeDm { get; set; }
-        }
 
+            public override string ToString()
+            {
+                return String.Format("(DateTime: {0}, PositiveDm: {1}, NegativeDm: {2})",
+                    DateTime, PositiveDm, NegativeDm);
+            }
+        }
+        
         public class Point
         {
             public DateTime DateTime { get; set; }
             public Decimal PositiveDi { get; set; }
             public Decimal NegativeDi { get; set; }
             public Decimal Adx { get; set; }
+
+            public override string ToString()
+            {
+                return String.Format("(DateTime: {0}, PositiveDi: {1}, NegativeDi: {2}, Adx: {3})", 
+                    DateTime, PositiveDi, NegativeDi, Adx);
+            }
         }
     }
 }

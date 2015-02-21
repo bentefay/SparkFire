@@ -11,7 +11,7 @@ using Shares.Model.Indicators;
 namespace Shares.Model.Test.Indicators
 {
     [TestClass]
-    public class MovingAverageIndicatorTests
+    public class MovingAverageTests
     {
         [TestMethod]
         public void SmaTest()
