@@ -102,19 +102,22 @@
                         type: 'line',
                         valueField: 'adx',
                         argumentField: 'dateTime',
-                        point: { visible: false }
+                        point: { visible: false },
+                        color: '#0000FF'
                     },
                     {
                         type: 'line',
                         valueField: 'positiveDi',
                         argumentField: 'dateTime',
-                        point: { visible: false }
+                        point: { visible: false },
+                        color: '#FF0000'
                     },
                     {
                         type: 'line',
                         valueField: 'negativeDi',
                         argumentField: 'dateTime',
-                        point: { visible: false }
+                        point: { visible: false },
+                        color: '#00FF00'
                     }
                 ];
 
