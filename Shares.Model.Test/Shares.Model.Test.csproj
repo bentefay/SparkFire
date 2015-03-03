@@ -94,6 +94,8 @@
     <None Include="Indicators\MovingAverageTests.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="Indicators\PercentR.csv" />
+    <None Include="Indicators\PercentR.xlsx" />
     <None Include="packages.config" />
   </ItemGroup>
   <Choose>

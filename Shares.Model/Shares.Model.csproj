@@ -32,6 +32,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="C5">
+      <HintPath>..\packages\C5.2.3.0.1\lib\net40\C5.dll</HintPath>
+    </Reference>
     <Reference Include="MoreLinq.Portable">
       <HintPath>..\packages\MoreLinq.Portable.1.1.0\lib\portable-net4+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1\MoreLinq.Portable.dll</HintPath>
     </Reference>
@@ -59,6 +62,7 @@
     <Compile Include="Indicators\Metadata\IndicatorInfoAggregator.cs" />
     <Compile Include="Indicators\Macd.cs" />
     <Compile Include="Indicators\Macdh.cs" />
+    <Compile Include="Indicators\PercentR.cs" />
     <Compile Include="ReadOnlyListExtensions.cs" />
     <Compile Include="Indicators\Sma.cs" />
     <Compile Include="Indicators\TrueRange.cs" />

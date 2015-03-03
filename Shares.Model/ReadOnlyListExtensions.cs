@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using C5;
 
 namespace Shares.Model
 {
@@ -31,6 +32,51 @@ namespace Shares.Model
         {
             for (int i = count; i < source.Count; i++)
                 yield return source[i];
+        }
+    }
+
+    public static class EnumerableExtensions
+    {
+        public static T Last<T>(this CircularQueue<T> source)
+        {
+            return source[source.Count - 1];
+        }
+
+        public static IEnumerable<CircularQueue<TSource>> FullWindow<TSource>(this IEnumerable<TSource> source, int size)
+        {
+            return Window(source, size, onlyFullWindows: true);
+        }
+
+        public static IEnumerable<CircularQueue<TSource>> Window<TSource>(this IEnumerable<TSource> source, int size, bool onlyFullWindows = false)
+        {
+            if (source == null) throw new ArgumentNullException("source");
+            if (size <= 0) throw new ArgumentOutOfRangeException("size");
+
+            return WindowedImpl(source, size);
+        }
+
+        private static IEnumerable<CircularQueue<TSource>> WindowedImpl<TSource>(this IEnumerable<TSource> source, int size, bool onlyFullWindows = false)
+        {
+            using (var iter = source.GetEnumerator())
+            {
+                var countLeft = size;
+                var window = new CircularQueue<TSource>();
+
+                while (countLeft-- > 0 && iter.MoveNext())
+                {
+                    window.Enqueue(iter.Current);
+                }
+
+                if (window.Count == size || !onlyFullWindows)
+                    yield return window;
+
+                while (iter.MoveNext())
+                {
+                    window.Dequeue();
+                    window.Enqueue(iter.Current);
+                    yield return window;
+                }
+            }
         }
     }
 }
