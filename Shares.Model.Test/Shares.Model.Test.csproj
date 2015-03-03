@@ -69,6 +69,7 @@
     <Compile Include="Indicators\AtrTests.cs" />
     <Compile Include="Indicators\EnumerableAssert.cs" />
     <Compile Include="Indicators\MacdhTests.cs" />
+    <Compile Include="Indicators\PercentRTests.cs" />
     <Compile Include="Indicators\PointComparer.cs" />
     <Compile Include="Indicators\MovingAverageTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -94,8 +95,10 @@
     <None Include="Indicators\MovingAverageTests.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="Indicators\PercentR.csv" />
-    <None Include="Indicators\PercentR.xlsx" />
+    <None Include="Indicators\PercentRTests.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Indicators\PercentRTests.xlsx" />
     <None Include="packages.config" />
   </ItemGroup>
   <Choose>
