@@ -15,7 +15,7 @@ namespace Shares.Model.Indicators
         }
 
         /// <summary>
-        /// Returns %R array of length [days.Length - nSmoothingPeriods + 1]
+        /// Returns %R array of length [days.Length - periods + 1]
         /// </summary>
         public static IEnumerable<Point<decimal>> Calculate(ShareDay[] days, int periods)
         {
