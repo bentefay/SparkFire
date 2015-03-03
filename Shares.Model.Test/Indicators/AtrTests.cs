@@ -27,7 +27,7 @@ namespace Shares.Model.Test.Indicators
 
         private static void TestAll(bool checkPadding)
         {
-            using (var csvReader = new CsvReader(new StreamReader("Indicators/AverageTrueRangeIndicatorTests.csv")))
+            using (var csvReader = new CsvReader(new StreamReader("Indicators/AtrTests.csv")))
             {
                 var expectedRecords = csvReader.GetRecords<AtrDay>().ToList();
 

@@ -80,7 +80,7 @@ namespace Shares.Model
 
         private const double DaysInAWeek = 7.0;
         private const double DaysInAMonth = 30.4375;
-        private const double DaysInAQuarter = 3 * 30.4375;
+        private const double DaysInAQuarter = 3 * DaysInAMonth;
         private const double DaysInAYear = 365.25;
 
         private static Func<ShareDay, int> GetDayShareGroupKeyFunction(ShareAggregateType aggregateType, int aggregateSize, bool relative, DateTime today)

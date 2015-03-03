@@ -67,10 +67,10 @@
   <ItemGroup>
     <Compile Include="Indicators\AdxTests.cs" />
     <Compile Include="Indicators\AtrTests.cs" />
-    <Compile Include="Indicators\EnumerableAssert.cs" />
+    <Compile Include="EnumerableAssert.cs" />
     <Compile Include="Indicators\MacdhTests.cs" />
     <Compile Include="Indicators\PercentRTests.cs" />
-    <Compile Include="Indicators\PointComparer.cs" />
+    <Compile Include="PointComparer.cs" />
     <Compile Include="Indicators\MovingAverageTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -85,7 +85,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Indicators\AdxTests.xlsx" />
-    <None Include="Indicators\AverageTrueRangeIndicatorTests.csv">
+    <None Include="Indicators\AtrTests.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Indicators\MacdhTests.csv">
