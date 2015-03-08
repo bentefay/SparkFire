@@ -63,6 +63,7 @@
     <Compile Include="Indicators\Macd.cs" />
     <Compile Include="Indicators\Macdh.cs" />
     <Compile Include="Indicators\PercentR.cs" />
+    <Compile Include="Indicators\TradingBand.cs" />
     <Compile Include="ReadOnlyListExtensions.cs" />
     <Compile Include="Indicators\Sma.cs" />
     <Compile Include="Indicators\TrueRange.cs" />
