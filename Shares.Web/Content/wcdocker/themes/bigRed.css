@@ -1,0 +1,200 @@
+.wcDocker {
+  background-color: #fff;
+}
+
+.wcPanelBackground {
+  background-color: #fff;
+}
+
+.wcPanelBackground .wcCenter {
+  background-color: #fff;
+}
+
+.wcFrameFlasher {
+  background-color: #fff;
+}
+
+.wcFrameShadower {
+  background-color: #fff;
+}
+
+.wcFrameTitle {
+  height: 20px;
+  background-color: #fff;
+  text-align: left;
+}
+
+.wcFrameCenter {
+  top: 20px;
+}
+
+.wcFrameButton {
+  width: 16px;
+  height: 16px;
+  border: 2px outset #fff;
+  background-color: #fff;
+  font-size: 15px;
+}
+
+.wcFrameMiniButton {
+  width: 8px;
+}
+
+.wcFrameButton:hover {
+  border: 2px outset #fff;
+  background-color: #fff;
+}
+
+.wcFrameButton:active {
+  border: 2px inset #fff;
+  background-color: #fff;
+}
+
+.wcFrameButtonToggled, .wcFrameButtonToggled:hover {
+  border-style: inset;
+}
+
+.wcLayoutGrid, .wcLayoutGrid tr, .wcLayoutGrid td {
+  border: 1px solid #555555;
+}
+
+.wcLayoutGridAlternate tr:nth-child(even), .wcLayoutGridAltColor {
+  background-color: rgba(200, 150, 150, 0.2) !important;
+}
+
+.wcFrameEdge {
+  position: absolute;
+  z-index: 2;
+  border: 2px outset #fff;
+  background-color: #fff;
+}
+
+.wcSplitterBar {
+  border: 1px solid #fff;
+  background-color: #fff;
+}
+
+.wcSplitterBarV {
+  border-left: 1px solid #fff;
+}
+
+.wcSplitterBarH {
+  border-top: 1px solid #fff;
+}
+
+.wcPanelTab {
+  color: #fff;
+  background-color: #fff;
+  border: 1px solid #fff;
+  border-radius: 5px 5px 0px 0px;
+  border-bottom: 0px;
+  margin-right: 1px;
+  margin-top: 5px;
+  font-size: 15px;
+  -webkit-box-shadow: inset 0px 2px 4px #fff;
+  -moz-box-shadow: inset 0px 2px 4px #fff;
+  -ms-box-shadow: inset 0px 2px 4px #fff;
+  -o-box-shadow: inset 0px 2px 4px #fff;
+  box-shadow: inset 0px 2px 4px #fff;
+  padding-left: 2px;
+  padding-right: 2px;
+  padding-bottom: 0px;
+}
+
+.wcPanelTab:hover {
+  background-color: #fff;
+}
+
+.wcPanelTabActive {
+  color: #000;
+  background-color: #fff;
+  font-weight: bold;
+  margin-top: 1px;
+  font-size: 16px;
+  line-height: 18px;
+}
+
+.wcPanelTabActive:hover {
+  background-color: #fff;
+}
+
+.wcGhost {
+  background-color: gray;
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+  background-color: #fff;
+}
+
+::-webkit-scrollbar-corner {
+  background-color: #fff;
+}
+
+::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px white;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  -webkit-box-shadow: inset 0 0 6px white;
+}
+
+.wcMenuList, .context-menu-list {
+  border: 1px solid #fff;
+}
+
+.wcMenuItem, .context-menu-item {
+  background-color: #fff;
+}
+
+.wcMenuItemHover, .wcMenuItem:hover, .context-menu-item.hover {
+  background-color: #fff;
+}
+
+.wcMenuItem.disabled, .context-menu-item.disabled {
+  color: white;
+  background-color: #fff;
+}
+
+.wcMenuSeparator, .context-menu-separator {
+  border: 2px solid #fff;
+  background-color: #fff;
+}
+
+.wcInput, input {
+  background-color: #fff;
+}
+
+.wcSelect, select {
+  background-color: #fff;
+}
+
+.wcButton, button {
+  border: 1px #fff;
+  background-color: #fff;
+}
+
+.wcButtonHover, .wcButton:hover, button:hover {
+  border: 1px outset #fff;
+  background-color: #fff;
+}
+
+.wcButtonActive, .wcButton:active, button:active {
+  border: 1px inset #fff;
+  background-color: #fff;
+}
+
+.wcButtonActive.wcButtonHover, .wcButton:hover.wcButtonActive, .wcButton:active.wcButtonHover, .wcButton:active:hover, button:active:hover {
+  border: 1px inset #fff;
+  background-color: #fff;
+}
+
+.wcButtonDisabled, .wcButton.disabled, button:disabled {
+  border: 1px outset #fff !important;
+  background-color: #fff !important;
+  color: #fff !important;
+}

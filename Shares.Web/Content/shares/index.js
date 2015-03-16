@@ -4,6 +4,9 @@ define(function (require) {
     var model;
     var shares = { XAxisSyncer: require('xAxisSyncer') };
     var chartOptions = require('chartOptions');
+    var rangeOptions = require('rangeOptions');
+    var instrumentCodeCollectionOptions = require('instrumentCodeCollectionOptions');
+    var indicatorCollectionOptions = require('indicatorCollectionOptions');
     var xAxisSyncer;
 
     $(document).ready(initialisePage);
@@ -25,21 +28,14 @@ define(function (require) {
         });
     }
 
-    function updateView(data) {
-        model.instrumentCodeTitle(data.raw.marketCode + " - " + data.raw.instrumentCode + " - " + data.raw.companyName);
-        model.days(data.days);
-    }
-
     function initialiseView() {
 
         model = {};
-
         model.days = ko.observableArray();
         model.indicatorData = {};
         model.instrumentCodesDataSource = ko.observable();
         model.indicatorsDataSource = ko.observable();
         model.useAggregation = { text: 'Use aggregation?' };
-
         model.chartOptionsCollection = ko.observableArray([
             { options: chartOptions.get('price', model.days), id: 'price', heightOption: { height: ko.observable(), ratio: 2 } },
             { options: chartOptions.get('volume', model.days), id: 'volume', heightOption: { height: ko.observable(), ratio: 1 } }
@@ -47,18 +43,18 @@ define(function (require) {
 
         updateChartHeights();
 
-        model.rangeOptions = getRangeOptions();
-        model.instrumentCodeOptions = getInstrumentCodeOptions();
+        model.selectedInstrumentCode = ko.observable();
+
+        model.rangeOptions = rangeOptions.get(model.days);
+        model.instrumentCodeOptions = instrumentCodeCollectionOptions.get(model.instrumentCodesDataSource, model.selectedInstrumentCode);
         model.instrumentCodeTitle = ko.observable();
-        model.indicators = getIndicatorOptions();
+        model.indicators = indicatorCollectionOptions.get(model.indicatorsDataSource);
 
         var aggregateTypes = ['Day', 'Week', 'Month', 'Quarter', 'Year'];
         model.aggregateType = { items: aggregateTypes, value: ko.observable(aggregateTypes[3]), width: 'auto', min: 1 };
 
         model.aggregateSize = { value: ko.observable(1) };
         model.isRelative = { text: 'Relative To Now?', value: ko.observable(true) };
-
-        model.selectedInstrumentCode = ko.observable();
 
         model.instrumentCodeRequestParams = ko.computed(function() {
             return constructInstrumentCodeRequestParams();
@@ -157,6 +153,11 @@ define(function (require) {
         });
     }
 
+    function updateView(data) {
+        model.instrumentCodeTitle(data.raw.marketCode + " - " + data.raw.instrumentCode + " - " +data.raw.companyName);
+        model.days(data.days);
+    }
+
     function onGetInstrumentCodes(data) {
 
         for (var i = 0; i < data.length; i++) {
@@ -176,33 +177,6 @@ define(function (require) {
                 showInstrument(params);
             });
 
-    }
-
-    function getInstrumentCodeOptions() {
-
-        return {
-            dataSource: model.instrumentCodesDataSource,
-            loadPanel: true,
-            scrolling: {
-                mode: 'virtual'
-            },
-            selection: {
-                mode: 'single'
-            },
-            sorting: {
-                mode: "none"
-            },
-            filterRow: {
-                visible: true,
-                applyFilter: "auto"
-            },
-            showColumnHeaders: false,
-            hoverStateEnabled: true,
-            onSelectionChanged: function (options) {
-                var data = options.selectedRowsData[0];
-                model.selectedInstrumentCode(data.instrumentCode);
-            }
-        }
     }
 
     function onGetIndicators(data) {
@@ -297,83 +271,5 @@ define(function (require) {
         model.indicatorsDataSource({
             store: arrayStore
         });
-    }
-
-    function getIndicatorOptions() {
-
-        return {
-            dataSource: model.indicatorsDataSource,
-            loadPanel: true,
-            showColumnLines: false,
-            columns: [
-                { dataField: 'isPlotted', dataType: 'boolean', allowFiltering: false, width: 30, allowEditing: true, showEditorAlways: true },
-                { dataField: 'displayName', allowEditing: false }
-            ],
-            scrolling: {
-                mode: 'standard'
-            },
-            editing: {
-                editEnabled: true,
-                editMode: 'batch'
-            },
-            selection: {
-                mode: 'single'
-            },
-            sorting: {
-                mode: "none"
-            },
-            filterRow: {
-                visible: false,
-                applyFilter: "auto"
-            },
-            searchPanel: {
-                visible: true,
-                width: 130
-            },
-            showColumnHeaders: false,
-            hoverStateEnabled: true,
-            onSelectionChanged: function (selecteditems) {
-                var data = selecteditems.selectedRowsData[0];
-            },
-            onRowUpdated: function (args) {
-            }
-        }
-    }
-
-    function getRangeOptions() {
-        return {
-            dataSource: model.days,
-            chart: {
-                useAggregation: true,
-                valueAxis: { valueType: 'numeric' },
-                series: {
-                    type: 'line',
-                    valueField: 'open',
-                    argumentField: 'date'
-                },
-            },
-            scale: {
-                minorTickInterval: 'month',
-                majorTickInterval: 'year',
-                valueType: 'datetime',
-                placeholderHeight: 20,
-                minRange: {
-                    days: 20
-                }
-            },
-            behavior: {
-                callSelectedRangeChanged: "onMovingComplete",
-                snapToTicks: true,
-                allowSlidersSwap: false,
-                animation: false
-            },
-            sliderMarker: { visible: false },
-            margin: {
-                right: 0,
-                left: 0,
-                top: 0,
-                bottom: 0
-            }
-        }
     }
 });
