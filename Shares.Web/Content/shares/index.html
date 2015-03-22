@@ -23,11 +23,12 @@
 
         <header>
             <div class="panel">
-                <div data-bind="dxCheckBox: useAggregation" class="button"></div>
                 <div data-bind="dxNumberBox: aggregateSize" class="button"></div>
-                <div data-bind="dxSelectBox: aggregateType" class="button"></div>
+                <div class="button" data-bind="foreach: aggregateTypes.items">
+                    <div data-bind="dxButton: { text: displayName, onClick: function() { $parent.aggregateTypes.selectedItem($data); }, width: 'auto', disabled: $parent.aggregateTypes.selectedItem() === $data }" class="button"></div>
+                </div>
                 <div data-bind="dxCheckBox: isRelative" class="button"></div>
-            </div>
+                </div>
         </header>
 
         <section class="main">

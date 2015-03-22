@@ -35,7 +35,6 @@ define(function (require) {
         model.indicatorData = {};
         model.instrumentCodesDataSource = ko.observable();
         model.indicatorsDataSource = ko.observable();
-        model.useAggregation = { text: 'Use aggregation?' };
         model.chartOptionsCollection = ko.observableArray([
             { options: chartOptions.get('price', model.days), id: 'price', heightOption: { height: ko.observable(), ratio: 2 } },
             { options: chartOptions.get('volume', model.days), id: 'volume', heightOption: { height: ko.observable(), ratio: 1 } }
@@ -50,11 +49,12 @@ define(function (require) {
         model.instrumentCodeTitle = ko.observable();
         model.indicators = indicatorCollectionOptions.get(model.indicatorsDataSource);
 
-        var aggregateTypes = ['Day', 'Week', 'Month', 'Quarter', 'Year'];
-        model.aggregateType = { items: aggregateTypes, value: ko.observable(aggregateTypes[3]), width: 'auto', min: 1 };
+        var aggregateTypes = [ { key: 'Day', displayName: 'd' }, { key: 'Week', displayName: 'w' }, { key: 'Month', displayName: 'm' }, 
+            { key: 'Quarter', displayName: 'q' }, { key: 'Year', displayName: 'y' }];
+        model.aggregateTypes = { items: aggregateTypes, selectedItem: ko.observable(aggregateTypes[3]) };
 
-        model.aggregateSize = { value: ko.observable(1) };
-        model.isRelative = { text: 'Relative To Now?', value: ko.observable(true) };
+        model.aggregateSize = { value: ko.observable(1), width: '60px' };
+        model.isRelative = { text: 'Relative', value: ko.observable(true) };
 
         model.instrumentCodeRequestParams = ko.computed(function() {
             return constructInstrumentCodeRequestParams();
@@ -105,7 +105,7 @@ define(function (require) {
     function constructInstrumentCodeRequestParams() {
         var params = {
             instrumentCode: model.selectedInstrumentCode(),
-            aggregateType: model.aggregateType.value(),
+            aggregateType: model.aggregateTypes.selectedItem().key,
             aggregateSize: model.aggregateSize.value(),
             isRelative: model.isRelative.value()
         };
