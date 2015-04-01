@@ -6,6 +6,7 @@ define(function() {
         self._instanceDescriptors = [];
         self._leader = null;
         self._timerId = null;
+        self._currentBounds = null;
     };
 
     constructor.prototype.add = function(instances) {
@@ -20,9 +21,8 @@ define(function() {
                 // dxChart
                 instance.on('drawn', function(args) {
                     var ranges = args.component.businessRanges[0].arg;
-                    if (ranges.minVisible && ranges.maxVisible) {
-                        self._updateZoom({ startValue: ranges.minVisible, endValue: ranges.maxVisible }, args.component);
-                    }
+                    if (ranges.minVisible && ranges.maxVisible)
+                        self._setAllBounds({ startValue: ranges.minVisible, endValue: ranges.maxVisible }, args.component);
                 });
 
                 instanceDescriptor.setBounds = function(newBounds) {
@@ -38,7 +38,7 @@ define(function() {
             } else if (instance.setSelectedRange) {
                 // dxRangeSelector
                 instance.on('selectedRangeChanged', function(args) {
-                    self._updateZoom(args, args.component);
+                    self._setAllBounds(args, args.component);
                 });
 
                 instanceDescriptor.setBounds = function(newBounds) {
@@ -53,6 +53,9 @@ define(function() {
             } else {
                 throw new Error("Unknown instance type");
             }
+
+            if (self._currentBounds)
+                instanceDescriptor.setBounds(self._currentBounds);
 
             self._instanceDescriptors.push(instanceDescriptor);
 
@@ -74,32 +77,42 @@ define(function() {
         self._instanceDescriptors = _(self._instanceDescriptors).difference(instanceDescriptorsToRemove);
     }
 
-    constructor.prototype._updateZoom = function(newBounds, instance) {
+    constructor.prototype._setAllBounds = function (newBounds, leader) {
         var self = this;
 
         if (self._leader === null) {
-            self._leader = instance;
-        } else if (instance !== self._leader) {
+            self._leader = leader;
+        } else if (leader !== self._leader) {
             return;
         }
 
         if (self._timerId !== null)
             clearTimeout(self._timerId);
 
-        self._timerId = setTimeout(function() {
-            self._leader = null;
-            self._timerId = null;
-        }, 500);
+        if (leader) {
+            self._timerId = setTimeout(function() {
+                self._leader = null;
+                self._timerId = null;
+            }, 500);
+        }
+
+        self._currentBounds = newBounds;
 
         for (var i = 0; i < self._instanceDescriptors.length; i++) {
 
             var instanceDescriptor = self._instanceDescriptors[i];
 
-            if (instanceDescriptor.instance === instance)
+            if (instanceDescriptor.instance === leader)
                 continue;
 
             instanceDescriptor.setBounds(newBounds);
         }
+    }
+
+    constructor.prototype.setAllBounds = function (startValue, endValue) {
+        var self = this;
+
+        self._setAllBounds({ startValue: startValue, endValue: endValue }, null);
     }
 
     function boundsEqual(bounds, startValue, endValue) {

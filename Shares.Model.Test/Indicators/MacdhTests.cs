@@ -37,7 +37,9 @@ namespace Shares.Model.Test.Indicators
 
                 var days = expectedData.Select(r => new ShareDay { Date = r.Date, Close = r.Price }).ToArray();
                 var actual = new MacdSignalLine().Calculate(days, 
-                    new MacdSignalLine.Parameters { LongEmaPeriods = 26, ShortEmaPeriods = 12, SignalEmaPeriods = 9 }).ToArray();
+                    new MacdSignalLine.Parameters { LongEmaPeriods = 26, ShortEmaPeriods = 12, SignalEmaPeriods = 9 })
+                    .Select(s => Point.With(s.DateTime, s.SignalLine))
+                    .ToArray();
 
                 var expected = expectedData.Where(r => r.Ema9.HasValue).Select(r => Point.With(r.Date, r.Ema9.Value)).ToArray();
 

@@ -38,10 +38,11 @@ namespace Shares.Web.Controllers
 
         private readonly IndicatorInfoAggregator _indicatorInfoAggregator = new IndicatorInfoAggregator()
             .AddIndicator<Atr, Atr.Parameters>("ATR")
-            .AddIndicator<Macd, Macd.Parameters>("MACD")
             .AddIndicator<MacdSignalLine, MacdSignalLine.Parameters>("MACD Signal Line", "MACD")
-            .AddIndicator<Macdh, Macdh.Parameters>("MACDH")
-            .AddIndicator<Adx, Adx.Parameters>("ADX");
+            .AddIndicator<Macdh, Macdh.Parameters>("MACD")
+            .AddIndicator<Adx, Adx.Parameters>("ADX")
+            .AddIndicator<PercentR, PercentR.Parameters>("Percent R", "PercentR")
+            .AddIndicator<TradingBand, TradingBand.Parameters>("Trading Band", "TradingBand");
 
         [Route("api/indicators")]
         public List<IndicatorInfo> GetAllIndicators()
@@ -57,12 +58,12 @@ namespace Shares.Web.Controllers
             return new Atr().Calculate(share.Days, parameters, 0, pad: true).ToList();
         }
 
-        [Route("api/indicator/macd")]
-        public List<Point<Decimal>> GetMacdIndicator([FromUri] ShareDataRequest request, [FromUri] Macd.Parameters parameters)
+        [Route("api/indicator/macdSignalLine")]
+        public List<MacdSignalLine.Point> GetMacdSignalLineIndicator([FromUri] ShareDataRequest request, [FromUri] MacdSignalLine.Parameters parameters)
         {
             var share = GetShareData(request);
 
-            return new Macd().Calculate(share.Days, parameters).ToList();
+            return new MacdSignalLine().Calculate(share.Days, parameters).ToList();
         }
 
         [Route("api/indicator/macdh")]
@@ -79,6 +80,22 @@ namespace Shares.Web.Controllers
             var share = GetShareData(request);
 
             return new Adx().Calculate(share.Days, parameters).ToList();
+        }
+
+        [Route("api/indicator/percentr")]
+        public List<Point<Decimal>> GetPercentRIndicator([FromUri] ShareDataRequest request, [FromUri] PercentR.Parameters parameters)
+        {
+            var share = GetShareData(request);
+
+            return new PercentR().Calculate(share.Days, parameters).ToList();
+        }
+
+        [Route("api/indicator/tradingband")]
+        public List<TradingBand.Point> GetTradingBandIndicator([FromUri] ShareDataRequest request, [FromUri] TradingBand.Parameters parameters)
+        {
+            var share = GetShareData(request);
+
+            return new TradingBand().Calculate(share.Days, parameters).ToList();
         }
 
         private string GetEodFilePath()

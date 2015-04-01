@@ -15,8 +15,7 @@ namespace Shares.Model.Indicators
         {
             var macd = Macd.Calculate(days, shortPeriods, longPeriods).ToArray();
             var signalLine = MacdSignalLine.Calculate(macd, signalPeriods).ToArray();
-            var macdNormalised = macd.Skip(signalPeriods - 1);
-            return macdNormalised.Select((r, i) => Point.With(r.DateTime, r.Value - signalLine[i].Value));
+            return macd.ZipEnds(signalLine, (m, s) => Point.With(m.DateTime, m.Value - s.Value));
         }
 
         public class Parameters : MacdSignalLine.Parameters

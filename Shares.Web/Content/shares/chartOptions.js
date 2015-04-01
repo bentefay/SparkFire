@@ -48,7 +48,7 @@
                 }
                 break;
 
-            case "ATR":
+            case "atr":
 
                 series = [
                     {
@@ -64,23 +64,34 @@
                 }
                 break;
 
-            case "MACD":
+            case "macdSignalLine":
 
                 series = [
                     {
+                        name: 'MACD',
                         type: 'line',
-                        valueField: 'value',
+                        valueField: 'macd',
                         argumentField: 'dateTime',
-                        point: { visible: false }
+                        point: { visible: false },
+                        color: '#000000'
+                    },
+                    {
+                        name: 'Signal Line',
+                        type: 'line',
+                        valueField: 'signalLine',
+                        argumentField: 'dateTime',
+                        point: { visible: false },
+                        color: '#FF0000'
                     }
                 ];
 
                 customizeTooltipText = function () {
-                    return "<b>".concat(Globalize.format(this.argument, "dd/MM/yyyy"), "</b><br/>", "MACD: ", this.value);
+                    return "<b>" + Globalize.format(this.argument, "dd/MM/yyyy") + "</b><br/>" +
+                        _(this.points).map(function (p) { return p.seriesName + ": " + p.value }).join("<br/>");
                 }
                 break;
 
-            case "MACDH":
+            case "macdh":
 
                 series = [
                     {
@@ -95,10 +106,27 @@
                 }
                 break;
 
-            case "ADX":
+            case "percentR":
 
                 series = [
                     {
+                        type: 'line',
+                        valueField: 'value',
+                        argumentField: 'dateTime',
+                        point: { visible: false }
+                    }
+                ];
+
+                customizeTooltipText = function () {
+                    return "<b>".concat(Globalize.format(this.argument, "dd/MM/yyyy"), "</b><br/>", "Percent R: ", this.value);
+                }
+                break;
+
+            case "adx":
+
+                series = [
+                    {
+                        name: 'ADX',
                         type: 'line',
                         valueField: 'adx',
                         argumentField: 'dateTime',
@@ -106,6 +134,7 @@
                         color: '#0000FF'
                     },
                     {
+                        name: 'Positive DI',
                         type: 'line',
                         valueField: 'positiveDi',
                         argumentField: 'dateTime',
@@ -113,6 +142,7 @@
                         color: '#FF0000'
                     },
                     {
+                        name: 'Negative DI',
                         type: 'line',
                         valueField: 'negativeDi',
                         argumentField: 'dateTime',
@@ -122,7 +152,43 @@
                 ];
 
                 customizeTooltipText = function () {
-                    return "<b>".concat(Globalize.format(this.argument, "dd/MM/yyyy"), "</b><br/>", "ADX: ", this.value);
+                    return "<b>" + Globalize.format(this.argument, "dd/MM/yyyy") + "</b><br/>" +
+                        _(this.points).map(function (p) { return p.seriesName + ": " + p.value }).join("<br/>");
+                }
+                break;
+
+            case "tradingBand":
+
+                series = [
+                    {
+                        name: 'Upper',
+                        type: 'line',
+                        valueField: 'upper',
+                        argumentField: 'dateTime',
+                        point: { visible: false },
+                        color: '#0000FF'
+                    },
+                    {
+                        name: 'Indicator',
+                        type: 'line',
+                        valueField: 'indicator',
+                        argumentField: 'dateTime',
+                        point: { visible: false },
+                        color: '#FF0000'
+                    },
+                    {
+                        name: 'Lower',
+                        type: 'line',
+                        valueField: 'lower',
+                        argumentField: 'dateTime',
+                        point: { visible: false },
+                        color: '#00FF00'
+                    }
+                ];
+
+                customizeTooltipText = function () {
+                    return "<b>" + Globalize.format(this.argument, "dd/MM/yyyy") + "</b><br/>" +
+                        _(this.points).map(function (p) { return p.seriesName + ": " + p.value }).join("<br/>");
                 }
                 break;
 
@@ -136,7 +202,7 @@
                 valueType: 'numeric',
                 placeholderSize: 40,
                 label: {
-                    customizeText: function () {
+                    customizeText: function() {
                         if (this.value >= 1000000000) {
                             return valueAxisPrefix.concat(this.value / 1000000000, "B");
                         } else if (this.value >= 1000000) {
@@ -179,7 +245,8 @@
                 opacity: 0.8,
                 paddingLeftRight: 9,
                 paddingTopBottom: 8,
-                arrowLength: 10
+                arrowLength: 10,
+                shared: true
             },
             legend: {
                 visible: false

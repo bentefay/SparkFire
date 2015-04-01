@@ -17,6 +17,7 @@ namespace Shares.Model.Indicators.Metadata
             var indicatorType = typeof (TIndicator);
             var name = indicatorType.Name;
             name = name.Replace("Indicator", "");
+            name = Char.ToLowerInvariant(name[0]) + name.Substring(1);
 
             indicatorInfo.Name = name;
             indicatorInfo.GraphGroup = graphGroup ?? name;

@@ -146,6 +146,9 @@ define(function (require) {
                 volume: data.volume[i]
             };
         }
+        
+        if (data.date.length > 0)
+            xAxisSyncer.setAllBounds(data.date[0], data.date[data.date.length - 1]);
 
         updateView({
             raw: data,
@@ -187,7 +190,7 @@ define(function (require) {
 
         var arrayStore = new DevExpress.data.ArrayStore({
             data: data,
-            key: 'displayName',
+            key: 'name',
             onUpdated: function (key) {
                 arrayStore.byKey(key).done(function (dataItem) {
 
