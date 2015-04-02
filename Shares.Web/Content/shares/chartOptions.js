@@ -227,7 +227,7 @@
                     visible: true
                 },
                 label: {
-                    visible: dataType === "volume"
+                    // visible: dataType === "volume"
                 },
                 argumentType: 'datetime'
             },
