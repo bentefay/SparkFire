@@ -31,20 +31,17 @@ define(function (require) {
     function initialiseView() {
 
         model = {};
-        model.days = ko.observableArray();
+        model.prices = ko.observableArray();
         model.indicatorData = {};
         model.instrumentCodesDataSource = ko.observable();
         model.indicatorsDataSource = ko.observable();
-        model.chartOptionsCollection = ko.observableArray([
-            { options: chartOptions.get('price', model.days), id: 'price', heightOption: { height: ko.observable(), ratio: 2 } },
-            { options: chartOptions.get('volume', model.days), id: 'volume', heightOption: { height: ko.observable(), ratio: 1 } }
-        ]);
+        model.chartOptionsCollection = ko.observableArray();
 
         updateChartHeights();
 
         model.selectedInstrumentCode = ko.observable();
 
-        model.rangeOptions = rangeOptions.get(model.days);
+        model.rangeOptions = rangeOptions.get(model.prices);
         model.instrumentCodeOptions = instrumentCodeCollectionOptions.get(model.instrumentCodesDataSource, model.selectedInstrumentCode);
         model.instrumentCodeTitle = ko.observable();
         model.indicators = indicatorCollectionOptions.get(model.indicatorsDataSource);
@@ -61,10 +58,6 @@ define(function (require) {
         });
 
         ko.applyBindings(model);
-
-        for (var i = 0; i < model.chartOptionsCollection().length; i++) {
-            model.chartOptionsCollection()[i].instance = $("#" + model.chartOptionsCollection()[i].id).dxChart("instance");
-        }
 
         model.rangeSelectorInstance = $("#range").dxRangeSelector("instance");
         model.instrumentCodesInstance = $("#instrumentCodes").dxDataGrid("instance");
@@ -88,7 +81,6 @@ define(function (require) {
         showLoading();
 
         xAxisSyncer = new shares.XAxisSyncer();
-        xAxisSyncer.add(_(model.chartOptionsCollection()).map(function (o) { return o.instance }));
         xAxisSyncer.add([model.rangeSelectorInstance]);
     }
 
@@ -134,31 +126,13 @@ define(function (require) {
 
     function onGetInstrumentData(data) {
 
-        var days = [];
-
-        for (var i = 0; i < data.date.length; i++) {
-            days[i] = {
-                date: data.date[i],
-                open: data.open[i],
-                high: data.high[i],
-                low: data.low[i],
-                close: data.close[i],
-                volume: data.volume[i]
-            };
-        }
+        var prices = data.prices;
         
-        if (data.date.length > 0)
-            xAxisSyncer.setAllBounds(data.date[0], data.date[data.date.length - 1]);
+        if (prices.length > 0)
+            xAxisSyncer.setAllBounds(prices[0].dateTime, prices[prices.length - 1].dateTime);
 
-        updateView({
-            raw: data,
-            days: days
-        });
-    }
-
-    function updateView(data) {
-        model.instrumentCodeTitle(data.raw.marketCode + " - " + data.raw.instrumentCode + " - " +data.raw.companyName);
-        model.days(data.days);
+        model.instrumentCodeTitle(data.marketCode + " - " + data.instrumentCode + " - " + data.companyName);
+        model.prices(data.prices);
     }
 
     function onGetInstrumentCodes(data) {

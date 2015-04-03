@@ -17,7 +17,7 @@
                         highValueField: 'high',
                         lowValueField: 'low',
                         closeValueField: 'close',
-                        argumentField: 'date',
+                        argumentField: 'dateTime',
                         color: '#5F8B95',
                         reduction: {
                             color: '#5F8B95'
@@ -38,8 +38,8 @@
                 series = [
                     {
                         type: 'bar',
-                        valueField: 'volume',
-                        argumentField: 'date'
+                        valueField: 'value',
+                        argumentField: 'dateTime'
                     }
                 ];
 
@@ -227,6 +227,8 @@
                     visible: true
                 },
                 label: {
+                    // Only having one chart with x axis labels results in the chart 
+                    // sometimes being a different width due to the labels increasing the margin
                     // visible: dataType === "volume"
                 },
                 argumentType: 'datetime'

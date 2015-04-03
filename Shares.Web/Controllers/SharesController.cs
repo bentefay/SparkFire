@@ -37,17 +37,35 @@ namespace Shares.Web.Controllers
         }
 
         private readonly IndicatorInfoAggregator _indicatorInfoAggregator = new IndicatorInfoAggregator()
+            .AddIndicator<Price, object>("Price")
+            .AddIndicator<Volume, object>("Volume")
             .AddIndicator<Atr, Atr.Parameters>("ATR")
-            .AddIndicator<MacdSignalLine, MacdSignalLine.Parameters>("MACD Signal Line", "MACD")
+            .AddIndicator<MacdSignalLine, MacdSignalLine.Parameters>("MACD Signal Line", "macd")
             .AddIndicator<Macdh, Macdh.Parameters>("MACD")
             .AddIndicator<Adx, Adx.Parameters>("ADX")
-            .AddIndicator<PercentR, PercentR.Parameters>("Percent R", "PercentR")
-            .AddIndicator<TradingBand, TradingBand.Parameters>("Trading Band", "TradingBand");
+            .AddIndicator<PercentR, PercentR.Parameters>("Percent R")
+            .AddIndicator<TradingBand, TradingBand.Parameters>("Trading Band", "price");
 
         [Route("api/indicators")]
         public List<IndicatorInfo> GetAllIndicators()
         {
             return _indicatorInfoAggregator.GetIndicatorInfos();
+        }
+
+        [Route("api/indicator/price")]
+        public List<Price.Point> GetPriceIndicator([FromUri] ShareDataRequest request)
+        {
+            var share = GetShareData(request);
+
+            return Price.Calculate(share.Days).ToList();
+        }
+
+        [Route("api/indicator/volume")]
+        public List<Point<uint>> GetVolumeIndicator([FromUri] ShareDataRequest request)
+        {
+            var share = GetShareData(request);
+
+            return Volume.Calculate(share.Days).ToList();
         }
 
         [Route("api/indicator/atr")]
@@ -98,15 +116,6 @@ namespace Shares.Web.Controllers
             return new TradingBand().Calculate(share.Days, parameters).ToList();
         }
 
-        private string GetEodFilePath()
-        {
-            foreach (var filePath in _eodFilePaths)
-                if (Directory.Exists(filePath))
-                    return filePath;
-
-            throw new Exception("None of the specified paths exist.");
-        }
-
         private Share GetShareData(ShareDataRequest request)
         {
             return _memoryCache.GetOrAdd(request, () =>
@@ -122,6 +131,15 @@ namespace Shares.Web.Controllers
 
                 return share;
             });
+        }
+
+        private string GetEodFilePath()
+        {
+            foreach (var filePath in _eodFilePaths)
+                if (Directory.Exists(filePath))
+                    return filePath;
+
+            throw new Exception("None of the specified paths exist.");
         }
     }
 }
