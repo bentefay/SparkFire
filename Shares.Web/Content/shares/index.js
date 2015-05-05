@@ -32,10 +32,11 @@ define(function (require) {
 
         model = {};
         model.prices = ko.observableArray();
-        model.indicatorData = {};
         model.instrumentCodesDataSource = ko.observable();
         model.indicatorsDataSource = ko.observable();
+
         model.chartOptionsCollection = ko.observableArray();
+        model.chartOptionsDictionary = {};
 
         updateChartHeights();
 
@@ -62,10 +63,9 @@ define(function (require) {
         model.rangeSelectorInstance = $("#range").dxRangeSelector("instance");
         model.instrumentCodesInstance = $("#instrumentCodes").dxDataGrid("instance");
         model.indicatorsInstance = $("#indicators").dxDataGrid("instance");
-        model.getDataStrategies = [];
+        model.getDataStrategies = {};
 
-        model.getDataStrategies.push({
-            dataId: "default",
+        model.getDataStrategies["default"] = {
             getData: function(params) {
                 $.ajax({
                     dataType: "json",
@@ -76,7 +76,7 @@ define(function (require) {
                     })
                 });
             }
-        });
+        };
 
         showLoading();
 
@@ -112,9 +112,9 @@ define(function (require) {
 
         showLoading();
 
-        for (var i = 0; i < model.getDataStrategies.length; i++) {
-            model.getDataStrategies[i].getData(params);
-        }
+        _(model.getDataStrategies).each(function(dataStrategy) {
+            dataStrategy.getData(params);
+        });
     }
 
     function showLoading() {
@@ -127,12 +127,14 @@ define(function (require) {
     function onGetInstrumentData(data) {
 
         var prices = data.prices;
-        
-        if (prices.length > 0)
-            xAxisSyncer.setAllBounds(prices[0].dateTime, prices[prices.length - 1].dateTime);
 
         model.instrumentCodeTitle(data.marketCode + " - " + data.instrumentCode + " - " + data.companyName);
         model.prices(data.prices);
+
+        setTimeout(function() {
+            if (prices.length > 0)
+                xAxisSyncer.setAllBounds(new Date(prices[0].dateTime), new Date(prices[prices.length - 1].dateTime));
+        }, 400);
     }
 
     function onGetInstrumentCodes(data) {
@@ -164,83 +166,10 @@ define(function (require) {
 
         var arrayStore = new DevExpress.data.ArrayStore({
             data: data,
-            key: 'name',
+            key: 'id',
             onUpdated: function (key) {
                 arrayStore.byKey(key).done(function (dataItem) {
-
-                    if (dataItem.isPlotted) {
-
-                        var getData = function(params) {
-
-                            params = _(params).extend(dataItem.defaultParameterObject);
-
-                            $.ajax({
-                                dataType: "json",
-                                url: "../../api/indicator/" + dataItem.name,
-                                data: params,
-                                success: function (data) {
-
-                                    model.indicatorData[key] = ko.observableArray(data);
-                                    var options = { options: chartOptions.get(key, model.indicatorData[key]), id: key, heightOption: { height: ko.observable("0%"), ratio: 1 } };
-                                    model.chartOptionsCollection.splice(1, 0, options);
-                                    var instance = $("#" + key).dxChart("instance");
-                                    xAxisSyncer.add([instance]);
-                                    options.instance = instance;
-
-                                    updateChartHeights();
-
-                                    var drawn = false;
-
-                                    var onDrawn = function () {
-
-                                        if (drawn) return;
-
-                                        instance.off('drawn', onDrawn);
-                                        drawn = true;
-
-                                        setTimeout(function () {
-                                            for (var i = 0; i < model.chartOptionsCollection().length; i++) {
-                                                model.chartOptionsCollection()[i].instance.render({
-                                                    force: true,
-                                                    animate: false,
-                                                    asyncSeriesRendering: true
-                                                });
-                                            }
-                                        }, 200);
-
-                                    };
-
-                                    instance.on('drawn', onDrawn);
-
-                                }
-                            });
-                        }
-
-                        var params = model.instrumentCodeRequestParams();
-                        getData(params);
-                        model.getDataStrategies.push({ dataId: key, getData: getData });
-
-                    } else {
-
-                        var removedOptions = model.chartOptionsCollection.remove(function (item) { return item.id === key; });
-                        delete model.indicatorData[key];
-
-                        xAxisSyncer.remove([removedOptions[0].instance]);
-                        model.getDataStrategies = _(model.getDataStrategies).reject(function(s) { return s.dataId === key; });
-
-                        updateChartHeights();
-
-                        setTimeout(function () {
-                            for (var i = 0; i < model.chartOptionsCollection().length; i++) {
-                                model.chartOptionsCollection()[i].instance.render({
-                                    force: true,
-                                    animate: false,
-                                    asyncSeriesRendering: true
-                                });
-                            }
-                        }, 200);
-
-                    }
+                    indicatorIsPlottedChanged(dataItem);
                 });
             }
         });
@@ -248,5 +177,183 @@ define(function (require) {
         model.indicatorsDataSource({
             store: arrayStore
         });
+    }
+
+    function indicatorIsPlottedChanged(indicatorInfo) {
+
+        if (indicatorInfo.isPlotted) {
+
+            addIndicator(indicatorInfo);
+
+        } else {
+
+            removeIndicator(indicatorInfo);
+        }
+    }
+
+    function addIndicator(indicatorInfo) {
+
+        var options = model.chartOptionsDictionary[indicatorInfo.graphGroup];
+        var isNewGraph = !options;
+
+        var dataSource = ko.observableArray();
+
+        if (isNewGraph) {
+            options = {
+                id: indicatorInfo.graphGroup,
+                heightOption: { height: ko.observable("0%"), ratio: 1 },
+                dataSource: dataSource,
+                indicatorInfos: {}
+            };
+        } else {
+            options.dataSource = dataSource;
+        }
+
+        options.indicatorInfos[indicatorInfo.id] = indicatorInfo;
+
+        updateIndicatorChart(options, !isNewGraph);
+    }
+
+    function removeIndicator(indicatorInfo) {
+
+        var options = model.chartOptionsDictionary[indicatorInfo.graphGroup];
+
+        if (_(options.indicatorInfos).keys().length > 1) {
+
+            delete options.indicatorInfos[indicatorInfo.id];
+            updateIndicatorChart(options, true);
+
+        } else {
+            model.chartOptionsCollection.remove(options);
+            delete model.chartOptionsDictionary[indicatorInfo.graphGroup];
+
+            xAxisSyncer.remove([options.instance]);
+            delete model.getDataStrategies[indicatorInfo.graphGroup];
+        }
+
+        updateChartHeights();
+
+        renderAllCharts();
+    }
+
+    function updateIndicatorChart(options, chartExists) {
+
+        var indicatorIds = _(options.indicatorInfos).map(function (info) { return info.id; });
+        options.options = chartOptions.get(indicatorIds, options.dataSource);
+
+        if (chartExists) {
+            model.chartOptionsCollection.remove(options);
+        }
+
+        model.chartOptionsCollection.splice(1, 0, options);
+        model.chartOptionsDictionary[options.id] = options;
+
+        var instance = $("#" + options.id).dxChart("instance");
+        options.instance = instance;
+
+        if (!chartExists) {
+            xAxisSyncer.add([instance]);
+        }
+
+        updateChartHeights();
+
+        renderAllChartsAfter(options.instance);
+
+        var getData = function (params) {
+
+            var indicatorInfos = _(options.indicatorInfos).map(function (info) { return info; });
+
+            var deferreds = _(options.indicatorInfos).map(function (info) {
+                params = _(params).extend(info.defaultParameterObject);
+                return $.ajax({
+                    dataType: "json",
+                    url: "../../api/indicator/" + info.id,
+                    data: params
+                });
+            });
+
+            whenDone(deferreds, function (results) {
+                var indicatorCollection = _(results).map(function (r, i) {
+                    return { info: indicatorInfos[i], data: r.data };
+                });
+                var data = mergeIndicatorData(indicatorCollection);
+                options.dataSource(data);
+            });
+        }
+
+        var params = model.instrumentCodeRequestParams();
+        getData(params);
+        model.getDataStrategies[options.id] = { getData: getData };
+    }
+
+    function whenDone(deferreds, done) {
+        $.when.apply(undefined, deferreds).done(function () {
+            if (deferreds.length === 1)
+                done([{ data: arguments[0], statusText: arguments[1], jqXHR: arguments[2] }]);
+            else
+                done(_(arguments).map(function (a) {
+                    return { data: a[0], statusText: a[1], jqXHR: a[2] };
+                }));
+        });
+    }
+
+    function mergeIndicatorData(indicatorCollection) {
+
+        var mergedPoints = {};
+
+        var fields = _(indicatorCollection).chain()
+            .map(function (i) {
+                return _(i.info.fieldNames)
+                    .filter(function (f) { return f !== "dateTime"; })
+                    .map(function (f) { return i.info.id + "_" + f; });
+            })
+            .flatten(true)
+            .value();
+
+        _(indicatorCollection).each(function (indicator) {
+            for (var i = 0; i < indicator.data.length; i++) {
+                var indicatorPoint = indicator.data[i];
+                var mergedPoint = mergedPoints[indicatorPoint.dateTime];
+                if (!mergedPoint) {
+                    mergedPoint = { dateTime: indicatorPoint.dateTime };
+                    _(fields).each(function(f) { mergedPoint[f] = null; });
+                    mergedPoints[indicatorPoint.dateTime] = mergedPoint;
+                }
+                _(indicatorPoint).chain().keys().each(function (key) {
+                    if (key !== "dateTime")
+                        mergedPoint[indicator.info.id + "_" + key] = indicatorPoint[key];
+                });
+            }
+        });
+
+        return _(mergedPoints).map(function(p) { return p; });
+    }
+
+    function renderAllChartsAfter(instance) {
+        var drawn = false;
+
+        var onDrawn = function () {
+
+            if (drawn) return;
+
+            instance.off('drawn', onDrawn);
+            drawn = true;
+
+            renderAllCharts();
+        };
+
+        instance.on('drawn', onDrawn);
+    }
+
+    function renderAllCharts() {
+        setTimeout(function () {
+            _(model.chartOptionsCollection()).each(function(option) {
+                option.instance.render({
+                    force: true,
+                    animate: false,
+                    asyncSeriesRendering: true
+                });
+            });
+        }, 200);
     }
 });

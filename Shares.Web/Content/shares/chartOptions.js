@@ -1,10 +1,9 @@
 ﻿define(function(require) {
 
-    function get(dataType, dataSource) {
+    function getConfig(dataType) {
 
         var series;
         var valueAxisPrefix = "";
-        var customizeTooltipText;
 
         switch (dataType) {
             case "price":
@@ -12,6 +11,7 @@
 
                 series = [
                     {
+                        name: 'Price',
                         type: 'candleStick',
                         openValueField: 'open',
                         highValueField: 'high',
@@ -21,37 +21,30 @@
                         color: '#5F8B95',
                         reduction: {
                             color: '#5F8B95'
+                        },
+                        getTooltips: function (data) {
+                            return ["Open: $" + data.openValue, "Close: $" + data.closeValue, "High: $" + data.highValue, "Low: $" + data.lowValue];
                         }
                     }
                 ];
-
-                customizeTooltipText = function () {
-                    return "<b>".concat(Globalize.format(this.argument, "dd/MM/yyyy"), "</b><br/>",
-                        "Open: $", this.openValue, "<br/>",
-                        "Close: $" + this.closeValue, "<br/>",
-                        "High: $", this.highValue, "<br/>",
-                        "Low: $", this.lowValue, "<br/>");
-                }
                 break;
 
             case "volume":
                 series = [
                     {
+                        name: 'Volume',
                         type: 'bar',
                         valueField: 'value',
                         argumentField: 'dateTime'
                     }
                 ];
-
-                customizeTooltipText = function () {
-                    return "<b>".concat(Globalize.format(this.argument, "dd/MM/yyyy"), "</b><br/>", "Volume: ", this.value);
-                }
                 break;
 
             case "atr":
 
                 series = [
                     {
+                        name: 'ATR',
                         type: 'line',
                         valueField: 'value',
                         argumentField: 'dateTime',
@@ -59,9 +52,6 @@
                     }
                 ];
 
-                customizeTooltipText = function () {
-                    return "<b>".concat(Globalize.format(this.argument, "dd/MM/yyyy"), "</b><br/>", "ATR: ", this.value);
-                }
                 break;
 
             case "macdSignalLine":
@@ -84,42 +74,31 @@
                         color: '#FF0000'
                     }
                 ];
-
-                customizeTooltipText = function () {
-                    return "<b>" + Globalize.format(this.argument, "dd/MM/yyyy") + "</b><br/>" +
-                        _(this.points).map(function (p) { return p.seriesName + ": " + p.value }).join("<br/>");
-                }
                 break;
 
             case "macdh":
 
                 series = [
                     {
+                        name: "MACDH",
                         type: 'bar',
                         valueField: 'value',
                         argumentField: 'dateTime'
                     }
                 ];
-
-                customizeTooltipText = function () {
-                    return "<b>".concat(Globalize.format(this.argument, "dd/MM/yyyy"), "</b><br/>", "MACDH: ", this.value);
-                }
                 break;
 
             case "percentR":
 
                 series = [
                     {
+                        name: 'Percent R',
                         type: 'line',
                         valueField: 'value',
                         argumentField: 'dateTime',
                         point: { visible: false }
                     }
                 ];
-
-                customizeTooltipText = function () {
-                    return "<b>".concat(Globalize.format(this.argument, "dd/MM/yyyy"), "</b><br/>", "Percent R: ", this.value);
-                }
                 break;
 
             case "adx":
@@ -150,18 +129,15 @@
                         color: '#00FF00'
                     }
                 ];
-
-                customizeTooltipText = function () {
-                    return "<b>" + Globalize.format(this.argument, "dd/MM/yyyy") + "</b><br/>" +
-                        _(this.points).map(function (p) { return p.seriesName + ": " + p.value }).join("<br/>");
-                }
                 break;
 
             case "tradingBand":
 
+                valueAxisPrefix = "$";
+
                 series = [
                     {
-                        name: 'Upper',
+                        name: 'TB Upper',
                         type: 'line',
                         valueField: 'upper',
                         argumentField: 'dateTime',
@@ -169,7 +145,7 @@
                         color: '#0000FF'
                     },
                     {
-                        name: 'Indicator',
+                        name: 'TB Indicator',
                         type: 'line',
                         valueField: 'indicator',
                         argumentField: 'dateTime',
@@ -177,7 +153,7 @@
                         color: '#FF0000'
                     },
                     {
-                        name: 'Lower',
+                        name: 'TB Lower',
                         type: 'line',
                         valueField: 'lower',
                         argumentField: 'dateTime',
@@ -185,16 +161,50 @@
                         color: '#00FF00'
                     }
                 ];
-
-                customizeTooltipText = function () {
-                    return "<b>" + Globalize.format(this.argument, "dd/MM/yyyy") + "</b><br/>" +
-                        _(this.points).map(function (p) { return p.seriesName + ": " + p.value }).join("<br/>");
-                }
                 break;
 
             default:
                 throw new Error("Unexpected dataType: " + dataType);
         }
+
+        _(series).chain().each(function(s) {
+            if (!s.getTooltips) {
+                s.getTooltips = function(data) {
+                    return [ data.seriesName + ": " + valueAxisPrefix + data.value ];
+                };
+            } 
+        });
+        
+        _(series).each(function(s) {
+            _(s).chain().keys().filter(function(k) {
+                return k.indexOf('alueField') != -1;
+            }).each(function(k) {
+                s[k] = dataType + "_" + s[k];
+            });
+        });
+
+        return {
+            series: series,
+            valueAxisPrefix: valueAxisPrefix
+        };
+    }
+
+    function get(dataTypes, dataSource) {
+
+        var configs = _(dataTypes).chain().map(function (dataType) { return getConfig(dataType); });
+
+        var customizeTooltipText = function () {
+            var that = this;
+            return "<b>" + Globalize.format(that.argument, "dd/MM/yyyy") + "</b><br/>" +
+                _(that.points).chain().map(function (p) {
+                    var options = p.point.series.getOptions();
+                    return options.getTooltips(p);
+                }).flatten(true).value().join("<br/>");
+        };
+
+        var series = configs.map(function (config) { return config.series; }).flatten(true).value();
+
+        var valueAxisPrefix = configs.value()[0].valueAxisPrefix;
 
         return {
             dataSource: dataSource,
@@ -202,7 +212,7 @@
                 valueType: 'numeric',
                 placeholderSize: 40,
                 label: {
-                    customizeText: function() {
+                    customizeText: function () {
                         if (this.value >= 1000000000) {
                             return valueAxisPrefix.concat(this.value / 1000000000, "B");
                         } else if (this.value >= 1000000) {
@@ -264,6 +274,7 @@
             animation: { enabled: false },
             loadingIndicator: { show: true }
         };
+
     }
 
     return { get: get };

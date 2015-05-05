@@ -37,14 +37,14 @@ namespace Shares.Web.Controllers
         }
 
         private readonly IndicatorInfoAggregator _indicatorInfoAggregator = new IndicatorInfoAggregator()
-            .AddIndicator<Price, object>("Price")
-            .AddIndicator<Volume, object>("Volume")
-            .AddIndicator<Atr, Atr.Parameters>("ATR")
-            .AddIndicator<MacdSignalLine, MacdSignalLine.Parameters>("MACD Signal Line", "macd")
-            .AddIndicator<Macdh, Macdh.Parameters>("MACD")
-            .AddIndicator<Adx, Adx.Parameters>("ADX")
-            .AddIndicator<PercentR, PercentR.Parameters>("Percent R")
-            .AddIndicator<TradingBand, TradingBand.Parameters>("Trading Band", "price");
+            .AddIndicator<Price, object, Price.Point>("Price")
+            .AddIndicator<Volume, object, Point<uint>>("Volume")
+            .AddIndicator<Atr, Atr.Parameters, Point<Decimal>>("ATR")
+            .AddIndicator<MacdSignalLine, MacdSignalLine.Parameters, MacdSignalLine.Point>("MACD Signal Line", "macd")
+            .AddIndicator<Macdh, Macdh.Parameters, Point<Decimal>>("MACD")
+            .AddIndicator<Adx, Adx.Parameters, Adx.Point>("ADX")
+            .AddIndicator<PercentR, PercentR.Parameters, Point<Decimal>>("Percent R")
+            .AddIndicator<TradingBand, TradingBand.Parameters, TradingBand.Point>("Trading Band", "price");
 
         [Route("api/indicators")]
         public List<IndicatorInfo> GetAllIndicators()

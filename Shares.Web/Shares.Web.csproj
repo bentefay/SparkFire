@@ -340,6 +340,7 @@
     <Content Include="Content\shares\index.html" />
     <Content Include="Content\shares\instrumentCodeCollectionOptions.js" />
     <Content Include="Content\shares\indicatorCollectionOptions.js" />
+    <Content Include="Content\shares\js\underscore.js" />
     <Content Include="Content\shares\kendo\js\angular.min.js" />
     <Content Include="Content\shares\kendo\js\cultures\kendo.culture.af-ZA.min.js" />
     <Content Include="Content\shares\kendo\js\cultures\kendo.culture.af.min.js" />
