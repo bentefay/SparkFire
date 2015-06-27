@@ -25,6 +25,7 @@
     <ApplicationInsightsResourceId>/subscriptions/7a97e0ab-b747-4970-a85e-c8048255257f/resourcegroups/Default-ApplicationInsights-CentralUS/providers/microsoft.insights/components/Shares.Web</ApplicationInsightsResourceId>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
+    <UseGlobalApplicationHostFile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -241,7 +242,6 @@
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Controllers\ShareDataRequest.cs" />
     <Compile Include="Controllers\ShareDto.cs" />
     <Compile Include="Controllers\SharesController.cs" />
     <Compile Include="Global.asax.cs">
@@ -254,7 +254,6 @@
     <Compile Include="Providers\ApplicationOAuthProvider.cs" />
     <Compile Include="Results\ChallengeResult.cs" />
     <Compile Include="Startup.cs" />
-    <Compile Include="Utility\MemoryCacheExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Areas\HelpPage\HelpPage.css" />

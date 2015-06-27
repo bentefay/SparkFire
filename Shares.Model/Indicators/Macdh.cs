@@ -11,7 +11,7 @@ namespace Shares.Model.Indicators
             return Calculate(days, p.SignalEmaPeriods, p.ShortEmaPeriods, p.LongEmaPeriods);
         }
 
-        public static IEnumerable<Point<decimal>> Calculate(ShareDay[] days, int signalPeriods, int shortPeriods, int longPeriods)
+        public static IEnumerable<Point<decimal>> Calculate(ShareDay[] days, int signalPeriods = 9, int shortPeriods = 12, int longPeriods = 26)
         {
             var macd = Macd.Calculate(days, shortPeriods, longPeriods).ToArray();
             var signalLine = MacdSignalLine.Calculate(macd, signalPeriods).ToArray();

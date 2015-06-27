@@ -51,7 +51,7 @@ namespace Shares.Model.Indicators
             }
         }
 
-        public static IEnumerable<Point> Calculate(ShareDay[] days, int periods)
+        public static IEnumerable<Point> Calculate(ShareDay[] days, int periods = 14)
         {
             // Plus/minus directional movements
             var dmPoints = CalculateDirectionalMovement(days).ToArray();

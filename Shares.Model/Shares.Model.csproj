@@ -38,6 +38,10 @@
     <Reference Include="MoreLinq.Portable">
       <HintPath>..\packages\MoreLinq.Portable.1.1.0\lib\portable-net4+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1\MoreLinq.Portable.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Reactive.Core">
@@ -46,6 +50,7 @@
     <Reference Include="System.Reactive.Interfaces">
       <HintPath>..\packages\Rx-Interfaces.2.2.2\lib\net45\System.Reactive.Interfaces.dll</HintPath>
     </Reference>
+    <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -53,6 +58,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Experiments\Dad1.cs" />
     <Compile Include="Indicators\Adx.cs" />
     <Compile Include="Indicators\Atr.cs" />
     <Compile Include="Indicators\Ema.cs" />
@@ -66,6 +72,8 @@
     <Compile Include="Indicators\Price.cs" />
     <Compile Include="Indicators\TradingBand.cs" />
     <Compile Include="Indicators\Volume.cs" />
+    <Compile Include="InstrumentDataRequest.cs" />
+    <Compile Include="InstrumentDataRepro.cs" />
     <Compile Include="ReadOnlyListExtensions.cs" />
     <Compile Include="Indicators\Sma.cs" />
     <Compile Include="Indicators\TrueRange.cs" />
@@ -77,10 +85,12 @@
     <Compile Include="Share.cs" />
     <Compile Include="ShareDay.cs" />
     <Compile Include="Tf.cs" />
+    <Compile Include="Utility\MemoryCacheExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
