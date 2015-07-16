@@ -58,7 +58,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Experiments\Dad1.cs" />
+    <Compile Include="Experiments\Experiment1.cs" />
+    <Compile Include="Experiments\IndexedValue.cs" />
+    <Compile Include="Experiments\Trade.cs" />
     <Compile Include="Indicators\Adx.cs" />
     <Compile Include="Indicators\Atr.cs" />
     <Compile Include="Indicators\Ema.cs" />

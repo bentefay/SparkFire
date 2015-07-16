@@ -36,7 +36,7 @@ namespace Shares.Model.Indicators
 
             for (int i = periods; i < days.Length; i++)
             {
-                // Equivalent to: (value - ema * (periods - 1)) / periods (if not using standar multiplier)
+                // Equivalent to: ema = (value - ema * (periods - 1)) / periods (if not using standard multiplier)
                 ema = (value(days[i]) - ema) * multiplier + ema;
                 yield return Point.With(date(days[i]), ema);
             }
